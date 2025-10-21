@@ -6,6 +6,7 @@ export interface Product {
   price: number
   category: string
   tags: string[]
+  image: string
 }
 
 export interface CartItem {
@@ -93,16 +94,126 @@ interface PromotionState {
 
 // Mock data
 const mockProducts: Product[] = [
-  { id: 'prod_101', name: '라운드랩 자작나무 수분 선크림', price: 25000, category: 'skincare', tags: ['sunscreen', 'moisture'] },
-  { id: 'prod_102', name: '메디힐 티트리 에센셜 마스크', price: 2000, category: 'skincare', tags: ['mask', 'soothing'] },
-  { id: 'prod_103', name: '클리오 킬커버 파운웨어 쿠션', price: 32000, category: 'makeup', tags: ['cushion', 'best-seller'] },
-  { id: 'prod_104', name: '롬앤 쥬시 래스팅 틴트', price: 9900, category: 'makeup', tags: ['tint', 'lip'] },
-  { id: 'prod_105', name: '바닐라코 클린 잇 제로 클렌징 밤', price: 18000, category: 'cleansing', tags: ['cleanser', 'best-seller'] },
-  { id: 'prod_106', name: '이니스프리 그린티 씨드 세럼', price: 27000, category: 'skincare', tags: ['serum', 'moisture'] },
-  { id: 'prod_107', name: '에뛰드 순정 약산성 5.5 진정 토너', price: 15000, category: 'skincare', tags: ['toner', 'soothing'] },
-  { id: 'prod_108', name: '페리페라 잉크 더 에어리 벨벳', price: 9000, category: 'makeup', tags: ['tint', 'lip', 'velvet'] },
-  { id: 'prod_109', name: '아비브 어성초 스팟 패드 카밍터치', price: 24000, category: 'skincare', tags: ['toner-pad', 'soothing'] },
-  { id: 'prod_110', name: '닥터자르트 시카페어 크림', price: 48000, category: 'skincare', tags: ['cream', 'cicapair'] },
+  { 
+    id: 'prod_101', 
+    name: '라운드랩 자작나무 수분 선크림', 
+    price: 25000, 
+    category: 'skincare', 
+    tags: ['sunscreen', 'moisture'],
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_102', 
+    name: '메디힐 티트리 에센셜 마스크', 
+    price: 2000, 
+    category: 'skincare', 
+    tags: ['mask', 'soothing'],
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_103', 
+    name: '클리오 킬커버 파운웨어 쿠션', 
+    price: 32000, 
+    category: 'makeup', 
+    tags: ['cushion', 'best-seller'],
+    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_104', 
+    name: '롬앤 쥬시 래스팅 틴트', 
+    price: 9900, 
+    category: 'makeup', 
+    tags: ['tint', 'lip'],
+    image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_105', 
+    name: '바닐라코 클린 잇 제로 클렌징 밤', 
+    price: 18000, 
+    category: 'cleansing', 
+    tags: ['cleanser', 'best-seller'],
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_106', 
+    name: '이니스프리 그린티 씨드 세럼', 
+    price: 27000, 
+    category: 'skincare', 
+    tags: ['serum', 'moisture'],
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_107', 
+    name: '에뛰드 순정 약산성 5.5 진정 토너', 
+    price: 15000, 
+    category: 'skincare', 
+    tags: ['toner', 'soothing'],
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_108', 
+    name: '페리페라 잉크 더 에어리 벨벳', 
+    price: 9000, 
+    category: 'makeup', 
+    tags: ['tint', 'lip', 'velvet'],
+    image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_109', 
+    name: '아비브 어성초 스팟 패드 카밍터치', 
+    price: 24000, 
+    category: 'skincare', 
+    tags: ['toner-pad', 'soothing'],
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_110', 
+    name: '닥터자르트 시카페어 크림', 
+    price: 48000, 
+    category: 'skincare', 
+    tags: ['cream', 'cicapair'],
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_111', 
+    name: '아이오페 맨 올데이 퍼펙트 선크림', 
+    price: 22000, 
+    category: 'skincare', 
+    tags: ['sunscreen', 'men'],
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_112', 
+    name: '헤라 센슈얼 파우더 매트', 
+    price: 35000, 
+    category: 'makeup', 
+    tags: ['powder', 'matte'],
+    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_113', 
+    name: '설화수 자음생크림', 
+    price: 120000, 
+    category: 'skincare', 
+    tags: ['cream', 'luxury'],
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_114', 
+    name: '에뛰드하우스 블러 퍼펙트 쿠션', 
+    price: 18000, 
+    category: 'makeup', 
+    tags: ['cushion', 'blur'],
+    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&h=300&fit=crop&crop=center'
+  },
+  { 
+    id: 'prod_115', 
+    name: '라네즈 워터뱅크 하이드로 크림', 
+    price: 28000, 
+    category: 'skincare', 
+    tags: ['cream', 'hydration'],
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+  }
 ]
 
 const mockUser: User = {
