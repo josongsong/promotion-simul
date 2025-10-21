@@ -132,7 +132,7 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
     const addConditionGroup = () => {
       const newGroup = {
         id: Date.now(),
-        conditions: [{ target: 'cart', attribute: 'subtotal', operator: 'GTE', value: '' }]
+        conditions: [{ target: 'cart' as const, attribute: 'subtotal', operator: 'GTE' as const, value: '' }]
       }
       setNewPromo(p => ({ ...p, conditionGroups: [...p.conditionGroups, newGroup] }))
     }
@@ -140,9 +140,9 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
     const addCondition = (groupIndex: number) => {
       const updatedGroups = [...newPromo.conditionGroups]
       updatedGroups[groupIndex].conditions.push({
-        target: 'cart',
+        target: 'cart' as const,
         attribute: 'subtotal',
-        operator: 'GTE',
+        operator: 'GTE' as const,
         value: ''
       })
       setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
@@ -186,136 +186,310 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
         {/* 프로모션 타입별 조건 및 액션 설정 */}
         {selectedType === 'discount' && (
           <div className="space-y-6">
-            <div className="p-4 border rounded-lg space-y-4">
-              <Label>할인 조건</Label>
-              <div className="grid grid-cols-3 gap-2">
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.target || 'cart'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].target = value as any
-                    if (value === 'user') {
-                      updatedGroups[0].conditions[0].attribute = 'membershipTier'
-                      updatedGroups[0].conditions[0].operator = 'EQ'
-                    } else if (value === 'cart') {
-                      updatedGroups[0].conditions[0].attribute = 'subtotal'
-                      updatedGroups[0].conditions[0].operator = 'GTE'
-                    }
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cart">🛒 장바구니</SelectItem>
-                    <SelectItem value="user">👤 사용자</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].attribute = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                      <>
-                        <SelectItem value="membershipTier">회원 등급</SelectItem>
-                        <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
-                      </>
-                    ) : (
-                      <>
-                        <SelectItem value="subtotal">총액</SelectItem>
-                        <SelectItem value="item_count">상품 수량</SelectItem>
-                      </>
-                    )}
-                  </SelectContent>
-                </Select>
-                
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].operator = value as any
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                      <>
-                        <SelectItem value="EQ">= (같음)</SelectItem>
-                      </>
-                    ) : (
-                      <>
-                        <SelectItem value="GTE">&gt;= (이상)</SelectItem>
-                        <SelectItem value="LTE">&lt;= (이하)</SelectItem>
-                      </>
-                    )}
-                  </SelectContent>
-                </Select>
+            {/* 조건 그룹 간 연산자 선택 */}
+            <div className="p-4 border rounded-lg space-y-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+              <div className="flex items-center gap-2">
+                <Label className="text-base font-semibold">조건 그룹 연산자</Label>
+                <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                    {newPromo.groupOperator === 'AND' ? '모든 그룹 만족' : '하나 이상 만족'}
+                  </span>
+                </div>
               </div>
-              
-              {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                newPromo.conditionGroups[0]?.conditions[0]?.attribute === 'membershipTier' ? (
-                  <Select
-                    value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'bronze'}
-                    onValueChange={(value) => {
-                      const updatedGroups = [...newPromo.conditionGroups]
-                      updatedGroups[0].conditions[0].value = value
-                      setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                    }}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'AND' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'AND'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'AND' && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">AND</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">모든 조건 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'OR' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'OR'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-green-300 hover:bg-green-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'OR' && <div className="w-2 h-2 bg-green-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">OR</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">하나 이상의 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>할인 조건</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addConditionGroup}
+                  className="flex items-center gap-2"
+                >
+                  <span>+</span>
+                  조건 그룹 추가
+                </Button>
+              </div>
+              {/* 조건 그룹들 렌더링 */}
+              {newPromo.conditionGroups.map((group, groupIndex) => (
+                <div key={group.id} className="space-y-4">
+                  {/* 그룹 간 연산자 표시 */}
+                  {groupIndex > 0 && (
+                    <div className="flex items-center justify-center py-2">
+                      <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
+                        newPromo.groupOperator === 'AND' 
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                          : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          newPromo.groupOperator === 'AND' ? 'bg-blue-500' : 'bg-green-500'
+                        }`} />
+                        {newPromo.groupOperator === 'AND' ? 'AND' : 'OR'}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/30 relative">
+                    {/* 그룹 헤더 */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          newPromo.groupOperator === 'AND' 
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                            : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                        }`}>
+                          {groupIndex + 1}
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">조건 그룹 {groupIndex + 1}</Label>
+                          <p className="text-xs text-muted-foreground">
+                            그룹 내 모든 조건이 만족되어야 함 (AND)
+                          </p>
+                        </div>
+                      </div>
+                      {newPromo.conditionGroups.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeConditionGroup(groupIndex)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  
+                  {group.conditions.map((condition, conditionIndex) => (
+                    <div key={conditionIndex} className="space-y-2">
+                      <div className="grid grid-cols-3 gap-2">
+                        <Select
+                          value={condition.target}
+                          onValueChange={(value) => {
+                            updateCondition(groupIndex, conditionIndex, 'target', value)
+                            if (value === 'user') {
+                              updateCondition(groupIndex, conditionIndex, 'attribute', 'membershipTier')
+                              updateCondition(groupIndex, conditionIndex, 'operator', 'EQ')
+                            } else if (value === 'cart') {
+                              updateCondition(groupIndex, conditionIndex, 'attribute', 'subtotal')
+                              updateCondition(groupIndex, conditionIndex, 'operator', 'GTE')
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cart">🛒 장바구니</SelectItem>
+                            <SelectItem value="user">👤 사용자</SelectItem>
+                            <SelectItem value="product">📦 상품</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={condition.attribute}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'attribute', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {condition.target === 'user' ? (
+                              <>
+                                <SelectItem value="membershipTier">회원 등급</SelectItem>
+                                <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
+                              </>
+                            ) : condition.target === 'product' ? (
+                              <>
+                                <SelectItem value="category">카테고리</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="subtotal">총액</SelectItem>
+                                <SelectItem value="item_count">상품 수량</SelectItem>
+                                <SelectItem value="product_quantity">특정 상품 수량</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={condition.operator}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'operator', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {condition.target === 'user' ? (
+                              <>
+                                <SelectItem value="EQ">= (같음)</SelectItem>
+                              </>
+                            ) : condition.attribute === 'category' ? (
+                              <>
+                                <SelectItem value="IN_CATEGORY">포함</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="GTE">&gt;= (이상)</SelectItem>
+                                <SelectItem value="LTE">&lt;= (이하)</SelectItem>
+                                <SelectItem value="EQ">= (같음)</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {/* 값 입력 필드 */}
+                      {condition.target === 'user' ? (
+                        condition.attribute === 'membershipTier' ? (
+                          <Select
+                            value={condition.value}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="bronze">🥉 브론즈</SelectItem>
+                              <SelectItem value="silver">🥈 실버</SelectItem>
+                              <SelectItem value="gold">🥇 골드</SelectItem>
+                              <SelectItem value="vip">💎 VIP</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Select
+                            value={condition.value}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="true">✨ 신규 회원</SelectItem>
+                              <SelectItem value="false">👤 기존 회원</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )
+                      ) : condition.attribute === 'category' ? (
+                        <Select
+                          value={condition.value}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="skincare">스킨케어</SelectItem>
+                            <SelectItem value="makeup">메이크업</SelectItem>
+                            <SelectItem value="cleansing">클렌징</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : condition.attribute === 'product_quantity' ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select
+                            value={condition.productId || ''}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'productId', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="상품 선택" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {products.map(p => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            type="number"
+                            placeholder="수량"
+                            value={condition.value}
+                            onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                          />
+                        </div>
+                      ) : (
+                        <Input
+                          type="number"
+                          placeholder="조건값 (예: 50000)"
+                          value={condition.value}
+                          onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                        />
+                      )}
+                      
+                      {/* 조건 삭제 버튼 */}
+                      {group.conditions.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeCondition(groupIndex, conditionIndex)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          조건 삭제
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* 조건 추가 버튼 */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addCondition(groupIndex)}
+                    className="flex items-center gap-2 w-full"
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="bronze">🥉 브론즈</SelectItem>
-                      <SelectItem value="silver">🥈 실버</SelectItem>
-                      <SelectItem value="gold">🥇 골드</SelectItem>
-                      <SelectItem value="vip">💎 VIP</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Select
-                    value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'true'}
-                    onValueChange={(value) => {
-                      const updatedGroups = [...newPromo.conditionGroups]
-                      updatedGroups[0].conditions[0].value = value
-                      setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">✨ 신규 회원</SelectItem>
-                      <SelectItem value="false">👤 기존 회원</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )
-              ) : (
-                <Input
-                  type="number"
-                  placeholder="조건값 (예: 50000)"
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''}
-                  onChange={(e) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].value = e.target.value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                  required
-                />
-              )}
+                    <span>+</span>
+                    조건 추가
+                  </Button>
+                </div>
+              </div>
+              ))}
             </div>
             
             <div className="p-4 border rounded-lg space-y-4">
@@ -354,278 +528,622 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
         )}
         
         {selectedType === 'free_shipping' && (
-          <div className="p-4 border rounded-lg space-y-4">
-            <Label>무료 배송 조건</Label>
-            <div className="grid grid-cols-3 gap-2">
-              <Select
-                value={newPromo.conditionGroups[0]?.conditions[0]?.target || 'cart'}
-                onValueChange={(value) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].target = value as any
-                  if (value === 'user') {
-                    updatedGroups[0].conditions[0].attribute = 'membershipTier'
-                    updatedGroups[0].conditions[0].operator = 'EQ'
-                  } else if (value === 'cart') {
-                    updatedGroups[0].conditions[0].attribute = 'subtotal'
-                    updatedGroups[0].conditions[0].operator = 'GTE'
-                  }
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cart">🛒 장바구니</SelectItem>
-                  <SelectItem value="user">👤 사용자</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Select
-                value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'}
-                onValueChange={(value) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].attribute = value
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                    <>
-                      <SelectItem value="membershipTier">회원 등급</SelectItem>
-                      <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
-                    </>
-                  ) : (
-                    <>
-                      <SelectItem value="subtotal">장바구니 총액</SelectItem>
-                      <SelectItem value="item_count">상품 수량</SelectItem>
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
-              
-              <Select
-                value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'}
-                onValueChange={(value) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].operator = value as any
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                    <>
-                      <SelectItem value="EQ">= (같음)</SelectItem>
-                    </>
-                  ) : (
-                    <>
-                      <SelectItem value="GTE">&gt;= (이상)</SelectItem>
-                      <SelectItem value="LTE">&lt;= (이하)</SelectItem>
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
+          <div className="space-y-6">
+            {/* 조건 그룹 간 연산자 선택 */}
+            <div className="p-4 border rounded-lg space-y-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+              <div className="flex items-center gap-2">
+                <Label className="text-base font-semibold">조건 그룹 연산자</Label>
+                <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                    {newPromo.groupOperator === 'AND' ? '모든 그룹 만족' : '하나 이상 만족'}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'AND' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'AND'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'AND' && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">AND</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">모든 조건 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'OR' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'OR'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-green-300 hover:bg-green-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'OR' && <div className="w-2 h-2 bg-green-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">OR</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">하나 이상의 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
             
-            {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-              newPromo.conditionGroups[0]?.conditions[0]?.attribute === 'membershipTier' ? (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'bronze'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].value = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>무료 배송 조건</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addConditionGroup}
+                  className="flex items-center gap-2"
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="bronze">🥉 브론즈</SelectItem>
-                    <SelectItem value="silver">🥈 실버</SelectItem>
-                    <SelectItem value="gold">🥇 골드</SelectItem>
-                    <SelectItem value="vip">💎 VIP</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'true'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].value = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="true">✨ 신규 회원</SelectItem>
-                    <SelectItem value="false">👤 기존 회원</SelectItem>
-                  </SelectContent>
-                </Select>
-              )
-            ) : (
-              <Input
-                type="number"
-                placeholder="금액 또는 수량 (예: 30000, 3)"
-                value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''}
-                onChange={(e) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].value = e.target.value
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-                required
-              />
-            )}
+                  <span>+</span>
+                  조건 그룹 추가
+                </Button>
+              </div>
+              {/* 조건 그룹들 렌더링 */}
+              {newPromo.conditionGroups.map((group, groupIndex) => (
+                <div key={group.id} className="space-y-4">
+                  {/* 그룹 간 연산자 표시 */}
+                  {groupIndex > 0 && (
+                    <div className="flex items-center justify-center py-2">
+                      <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
+                        newPromo.groupOperator === 'AND' 
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                          : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          newPromo.groupOperator === 'AND' ? 'bg-blue-500' : 'bg-green-500'
+                        }`} />
+                        {newPromo.groupOperator === 'AND' ? 'AND' : 'OR'}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/30 relative">
+                    {/* 그룹 헤더 */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          newPromo.groupOperator === 'AND' 
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                            : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                        }`}>
+                          {groupIndex + 1}
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">조건 그룹 {groupIndex + 1}</Label>
+                          <p className="text-xs text-muted-foreground">
+                            그룹 내 모든 조건이 만족되어야 함 (AND)
+                          </p>
+                        </div>
+                      </div>
+                      {newPromo.conditionGroups.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeConditionGroup(groupIndex)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  
+                  {group.conditions.map((condition, conditionIndex) => (
+                    <div key={conditionIndex} className="space-y-2">
+                      <div className="grid grid-cols-3 gap-2">
+                        <Select
+                          value={condition.target}
+                          onValueChange={(value) => {
+                            updateCondition(groupIndex, conditionIndex, 'target', value)
+                            if (value === 'user') {
+                              updateCondition(groupIndex, conditionIndex, 'attribute', 'membershipTier')
+                              updateCondition(groupIndex, conditionIndex, 'operator', 'EQ')
+                            } else if (value === 'cart') {
+                              updateCondition(groupIndex, conditionIndex, 'attribute', 'subtotal')
+                              updateCondition(groupIndex, conditionIndex, 'operator', 'GTE')
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cart">🛒 장바구니</SelectItem>
+                            <SelectItem value="user">👤 사용자</SelectItem>
+                            <SelectItem value="product">📦 상품</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={condition.attribute}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'attribute', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {condition.target === 'user' ? (
+                              <>
+                                <SelectItem value="membershipTier">회원 등급</SelectItem>
+                                <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
+                              </>
+                            ) : condition.target === 'product' ? (
+                              <>
+                                <SelectItem value="category">카테고리</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="subtotal">총액</SelectItem>
+                                <SelectItem value="item_count">상품 수량</SelectItem>
+                                <SelectItem value="product_quantity">특정 상품 수량</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={condition.operator}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'operator', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {condition.target === 'user' ? (
+                              <>
+                                <SelectItem value="EQ">= (같음)</SelectItem>
+                              </>
+                            ) : condition.attribute === 'category' ? (
+                              <>
+                                <SelectItem value="IN_CATEGORY">포함</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="GTE">&gt;= (이상)</SelectItem>
+                                <SelectItem value="LTE">&lt;= (이하)</SelectItem>
+                                <SelectItem value="EQ">= (같음)</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {/* 값 입력 필드 */}
+                      {condition.target === 'user' ? (
+                        condition.attribute === 'membershipTier' ? (
+                          <Select
+                            value={condition.value}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="bronze">🥉 브론즈</SelectItem>
+                              <SelectItem value="silver">🥈 실버</SelectItem>
+                              <SelectItem value="gold">🥇 골드</SelectItem>
+                              <SelectItem value="vip">💎 VIP</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Select
+                            value={condition.value}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="true">✨ 신규 회원</SelectItem>
+                              <SelectItem value="false">👤 기존 회원</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )
+                      ) : condition.attribute === 'category' ? (
+                        <Select
+                          value={condition.value}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="skincare">스킨케어</SelectItem>
+                            <SelectItem value="makeup">메이크업</SelectItem>
+                            <SelectItem value="cleansing">클렌징</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : condition.attribute === 'product_quantity' ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select
+                            value={condition.productId || ''}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'productId', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="상품 선택" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {products.map(p => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            type="number"
+                            placeholder="수량"
+                            value={condition.value}
+                            onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                          />
+                        </div>
+                      ) : (
+                        <Input
+                          type="number"
+                          placeholder="조건값 (예: 50000)"
+                          value={condition.value}
+                          onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                        />
+                      )}
+                      
+                      {/* 조건 삭제 버튼 */}
+                      {group.conditions.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeCondition(groupIndex, conditionIndex)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          조건 삭제
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* 조건 추가 버튼 */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addCondition(groupIndex)}
+                    className="flex items-center gap-2 w-full"
+                  >
+                    <span>+</span>
+                    조건 추가
+                  </Button>
+                </div>
+              </div>
+              ))}
+            </div>
           </div>
         )}
         
         {selectedType === 'gwp' && (
-          <div className="p-4 border rounded-lg space-y-4">
-            <Label>사은품 증정 조건</Label>
-            <div className="grid grid-cols-3 gap-2">
-              <Select
-                value={newPromo.conditionGroups[0]?.conditions[0]?.target || 'cart'}
-                onValueChange={(value) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].target = value as any
-                  if (value === 'user') {
-                    updatedGroups[0].conditions[0].attribute = 'membershipTier'
-                    updatedGroups[0].conditions[0].operator = 'EQ'
-                  } else if (value === 'cart') {
-                    updatedGroups[0].conditions[0].attribute = 'subtotal'
-                    updatedGroups[0].conditions[0].operator = 'GTE'
-                  }
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cart">장바구니</SelectItem>
-                  <SelectItem value="user">사용자</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'membershipTier'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].attribute = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
+          <div className="space-y-6">
+            {/* 조건 그룹 간 연산자 선택 */}
+            <div className="p-4 border rounded-lg space-y-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+              <div className="flex items-center gap-2">
+                <Label className="text-base font-semibold">조건 그룹 연산자</Label>
+                <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                    {newPromo.groupOperator === 'AND' ? '모든 그룹 만족' : '하나 이상 만족'}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'AND' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'AND'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/50'
+                  }`}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="membershipTier">회원 등급</SelectItem>
-                    <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].attribute = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'AND' && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">AND</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">모든 조건 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'OR' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'OR'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-green-300 hover:bg-green-50/50'
+                  }`}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="subtotal">장바구니 총액</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-              
-              <Select
-                value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'}
-                onValueChange={(value) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].operator = value as any
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                    <>
-                      <SelectItem value="EQ">= (같음)</SelectItem>
-                    </>
-                  ) : (
-                    <>
-                      <SelectItem value="GTE">&gt;= (이상)</SelectItem>
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'OR' && <div className="w-2 h-2 bg-green-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">OR</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">하나 이상의 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
             
-            {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-              newPromo.conditionGroups[0]?.conditions[0]?.attribute === 'membershipTier' ? (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'bronze'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].value = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>사은품 증정 조건</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addConditionGroup}
+                  className="flex items-center gap-2"
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="bronze">브론즈</SelectItem>
-                    <SelectItem value="silver">실버</SelectItem>
-                    <SelectItem value="gold">골드</SelectItem>
-                    <SelectItem value="vip">VIP</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'true'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].value = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="true">신규 회원</SelectItem>
-                    <SelectItem value="false">기존 회원</SelectItem>
-                  </SelectContent>
-                </Select>
-              )
-            ) : (
-              <Input
-                type="number"
-                placeholder="금액 (예: 50000)"
-                value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''}
-                onChange={(e) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].value = e.target.value
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-                required
-              />
-            )}
+                  <span>+</span>
+                  조건 그룹 추가
+                </Button>
+              </div>
+              {/* 조건 그룹들 렌더링 */}
+              {newPromo.conditionGroups.map((group, groupIndex) => (
+                <div key={group.id} className="space-y-4">
+                  {/* 그룹 간 연산자 표시 */}
+                  {groupIndex > 0 && (
+                    <div className="flex items-center justify-center py-2">
+                      <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
+                        newPromo.groupOperator === 'AND' 
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                          : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          newPromo.groupOperator === 'AND' ? 'bg-blue-500' : 'bg-green-500'
+                        }`} />
+                        {newPromo.groupOperator === 'AND' ? 'AND' : 'OR'}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/30 relative">
+                    {/* 그룹 헤더 */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          newPromo.groupOperator === 'AND' 
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                            : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                        }`}>
+                          {groupIndex + 1}
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">조건 그룹 {groupIndex + 1}</Label>
+                          <p className="text-xs text-muted-foreground">
+                            그룹 내 모든 조건이 만족되어야 함 (AND)
+                          </p>
+                        </div>
+                      </div>
+                      {newPromo.conditionGroups.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeConditionGroup(groupIndex)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  
+                  {group.conditions.map((condition, conditionIndex) => (
+                    <div key={conditionIndex} className="space-y-2">
+                      <div className="grid grid-cols-3 gap-2">
+                        <Select
+                          value={condition.target}
+                          onValueChange={(value) => {
+                            updateCondition(groupIndex, conditionIndex, 'target', value)
+                            if (value === 'user') {
+                              updateCondition(groupIndex, conditionIndex, 'attribute', 'membershipTier')
+                              updateCondition(groupIndex, conditionIndex, 'operator', 'EQ')
+                            } else if (value === 'cart') {
+                              updateCondition(groupIndex, conditionIndex, 'attribute', 'subtotal')
+                              updateCondition(groupIndex, conditionIndex, 'operator', 'GTE')
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cart">🛒 장바구니</SelectItem>
+                            <SelectItem value="user">👤 사용자</SelectItem>
+                            <SelectItem value="product">📦 상품</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={condition.attribute}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'attribute', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {condition.target === 'user' ? (
+                              <>
+                                <SelectItem value="membershipTier">회원 등급</SelectItem>
+                                <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
+                              </>
+                            ) : condition.target === 'product' ? (
+                              <>
+                                <SelectItem value="category">카테고리</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="subtotal">총액</SelectItem>
+                                <SelectItem value="item_count">상품 수량</SelectItem>
+                                <SelectItem value="product_quantity">특정 상품 수량</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={condition.operator}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'operator', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {condition.target === 'user' ? (
+                              <>
+                                <SelectItem value="EQ">= (같음)</SelectItem>
+                              </>
+                            ) : condition.attribute === 'category' ? (
+                              <>
+                                <SelectItem value="IN_CATEGORY">포함</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="GTE">&gt;= (이상)</SelectItem>
+                                <SelectItem value="LTE">&lt;= (이하)</SelectItem>
+                                <SelectItem value="EQ">= (같음)</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {/* 값 입력 필드 */}
+                      {condition.target === 'user' ? (
+                        condition.attribute === 'membershipTier' ? (
+                          <Select
+                            value={condition.value}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="bronze">🥉 브론즈</SelectItem>
+                              <SelectItem value="silver">🥈 실버</SelectItem>
+                              <SelectItem value="gold">🥇 골드</SelectItem>
+                              <SelectItem value="vip">💎 VIP</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Select
+                            value={condition.value}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="true">✨ 신규 회원</SelectItem>
+                              <SelectItem value="false">👤 기존 회원</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )
+                      ) : condition.attribute === 'category' ? (
+                        <Select
+                          value={condition.value}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="skincare">스킨케어</SelectItem>
+                            <SelectItem value="makeup">메이크업</SelectItem>
+                            <SelectItem value="cleansing">클렌징</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : condition.attribute === 'product_quantity' ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select
+                            value={condition.productId || ''}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'productId', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="상품 선택" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {products.map(p => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            type="number"
+                            placeholder="수량"
+                            value={condition.value}
+                            onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                          />
+                        </div>
+                      ) : (
+                        <Input
+                          type="number"
+                          placeholder="조건값 (예: 50000)"
+                          value={condition.value}
+                          onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                        />
+                      )}
+                      
+                      {/* 조건 삭제 버튼 */}
+                      {group.conditions.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeCondition(groupIndex, conditionIndex)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          조건 삭제
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* 조건 추가 버튼 */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addCondition(groupIndex)}
+                    className="flex items-center gap-2 w-full"
+                  >
+                    <span>+</span>
+                    조건 추가
+                  </Button>
+                </div>
+              </div>
+              ))}
+            </div>
             
             <Separator />
             <div className="pt-4 space-y-2">
@@ -655,45 +1173,187 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
         
         {selectedType === 'bogo' && (
           <div className="space-y-6">
-            <div className="p-4 border rounded-lg space-y-4">
-              <Label>BOGO 조건 (Buy)</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.productId || ''}
-                  onValueChange={(value) => {
-                    const selectedProduct = products.find(p => p.id === value)
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].productId = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                    
-                    const updatedActions = [...newPromo.actions]
-                    updatedActions[0].value = selectedProduct ? selectedProduct.price.toString() : '0'
-                    setNewPromo(prev => ({ ...prev, actions: updatedActions }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="상품 선택" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {products.map(p => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="number"
-                  placeholder="구매 수량 (예: 2)"
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''}
-                  onChange={(e) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].value = e.target.value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                  required
-                />
+            {/* 조건 그룹 간 연산자 선택 */}
+            <div className="p-4 border rounded-lg space-y-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+              <div className="flex items-center gap-2">
+                <Label className="text-base font-semibold">조건 그룹 연산자</Label>
+                <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                    {newPromo.groupOperator === 'AND' ? '모든 그룹 만족' : '하나 이상 만족'}
+                  </span>
+                </div>
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'AND' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'AND'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'AND' && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">AND</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">모든 조건 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'OR' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'OR'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-green-300 hover:bg-green-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'OR' && <div className="w-2 h-2 bg-green-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">OR</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">하나 이상의 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>BOGO 조건 (Buy)</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addConditionGroup}
+                  className="flex items-center gap-2"
+                >
+                  <span>+</span>
+                  조건 그룹 추가
+                </Button>
+              </div>
+              {/* 조건 그룹들 렌더링 */}
+              {newPromo.conditionGroups.map((group, groupIndex) => (
+                <div key={group.id} className="space-y-4">
+                  {/* 그룹 간 연산자 표시 */}
+                  {groupIndex > 0 && (
+                    <div className="flex items-center justify-center py-2">
+                      <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
+                        newPromo.groupOperator === 'AND' 
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                          : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          newPromo.groupOperator === 'AND' ? 'bg-blue-500' : 'bg-green-500'
+                        }`} />
+                        {newPromo.groupOperator === 'AND' ? 'AND' : 'OR'}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/30 relative">
+                    {/* 그룹 헤더 */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          newPromo.groupOperator === 'AND' 
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                            : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                        }`}>
+                          {groupIndex + 1}
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">조건 그룹 {groupIndex + 1}</Label>
+                          <p className="text-xs text-muted-foreground">
+                            그룹 내 모든 조건이 만족되어야 함 (AND)
+                          </p>
+                        </div>
+                      </div>
+                      {newPromo.conditionGroups.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeConditionGroup(groupIndex)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  
+                  {group.conditions.map((condition, conditionIndex) => (
+                    <div key={conditionIndex} className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2">
+                        <Select
+                          value={condition.productId || ''}
+                          onValueChange={(value) => {
+                            const selectedProduct = products.find(p => p.id === value)
+                            updateCondition(groupIndex, conditionIndex, 'productId', value)
+                            
+                            // BOGO의 경우 할인액을 상품 가격으로 설정
+                            const updatedActions = [...newPromo.actions]
+                            updatedActions[0].value = selectedProduct ? selectedProduct.price.toString() : '0'
+                            setNewPromo(prev => ({ ...prev, actions: updatedActions }))
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="상품 선택" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {products.map(p => (
+                              <SelectItem key={p.id} value={p.id}>
+                                {p.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          type="number"
+                          placeholder="구매 수량 (예: 2)"
+                          value={condition.value}
+                          onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                          required
+                        />
+                      </div>
+                      
+                      {/* 조건 삭제 버튼 */}
+                      {group.conditions.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeCondition(groupIndex, conditionIndex)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          조건 삭제
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* 조건 추가 버튼 */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addCondition(groupIndex)}
+                    className="flex items-center gap-2 w-full"
+                  >
+                    <span>+</span>
+                    조건 추가
+                  </Button>
+                </div>
+              </div>
+              ))}
             </div>
             
             <div className="p-4 border rounded-lg space-y-2">
@@ -707,6 +1367,312 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
         
         {selectedType === 'tiered' && (
           <div className="space-y-6">
+            {/* 조건 그룹 간 연산자 선택 */}
+            <div className="p-4 border rounded-lg space-y-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+              <div className="flex items-center gap-2">
+                <Label className="text-base font-semibold">조건 그룹 연산자</Label>
+                <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                    {newPromo.groupOperator === 'AND' ? '모든 그룹 만족' : '하나 이상 만족'}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'AND' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'AND'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'AND' && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">AND</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">모든 조건 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'OR' }))}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    newPromo.groupOperator === 'OR'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-green-300 hover:bg-green-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                      {newPromo.groupOperator === 'OR' && <div className="w-2 h-2 bg-green-500 rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-sm">OR</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">하나 이상의 그룹이 만족</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>할인 조건</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addConditionGroup}
+                  className="flex items-center gap-2"
+                >
+                  <span>+</span>
+                  조건 그룹 추가
+                </Button>
+              </div>
+              {/* 조건 그룹들 렌더링 */}
+              {newPromo.conditionGroups.map((group, groupIndex) => (
+                <div key={group.id} className="space-y-4">
+                  {/* 그룹 간 연산자 표시 */}
+                  {groupIndex > 0 && (
+                    <div className="flex items-center justify-center py-2">
+                      <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
+                        newPromo.groupOperator === 'AND' 
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                          : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          newPromo.groupOperator === 'AND' ? 'bg-blue-500' : 'bg-green-500'
+                        }`} />
+                        {newPromo.groupOperator === 'AND' ? 'AND' : 'OR'}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="space-y-4 p-4 border rounded-lg bg-muted/30 relative">
+                    {/* 그룹 헤더 */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          newPromo.groupOperator === 'AND' 
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
+                            : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                        }`}>
+                          {groupIndex + 1}
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">조건 그룹 {groupIndex + 1}</Label>
+                          <p className="text-xs text-muted-foreground">
+                            그룹 내 모든 조건이 만족되어야 함 (AND)
+                          </p>
+                        </div>
+                      </div>
+                      {newPromo.conditionGroups.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeConditionGroup(groupIndex)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  
+                  {group.conditions.map((condition, conditionIndex) => (
+                    <div key={conditionIndex} className="space-y-2">
+                      <div className="grid grid-cols-3 gap-2">
+                        <Select
+                          value={condition.target}
+                          onValueChange={(value) => {
+                            updateCondition(groupIndex, conditionIndex, 'target', value)
+                            if (value === 'user') {
+                              updateCondition(groupIndex, conditionIndex, 'attribute', 'membershipTier')
+                              updateCondition(groupIndex, conditionIndex, 'operator', 'EQ')
+                            } else if (value === 'cart') {
+                              updateCondition(groupIndex, conditionIndex, 'attribute', 'subtotal')
+                              updateCondition(groupIndex, conditionIndex, 'operator', 'GTE')
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cart">🛒 장바구니</SelectItem>
+                            <SelectItem value="user">👤 사용자</SelectItem>
+                            <SelectItem value="product">📦 상품</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={condition.attribute}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'attribute', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {condition.target === 'user' ? (
+                              <>
+                                <SelectItem value="membershipTier">회원 등급</SelectItem>
+                                <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
+                              </>
+                            ) : condition.target === 'product' ? (
+                              <>
+                                <SelectItem value="category">카테고리</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="subtotal">총액</SelectItem>
+                                <SelectItem value="item_count">상품 수량</SelectItem>
+                                <SelectItem value="product_quantity">특정 상품 수량</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        
+                        <Select
+                          value={condition.operator}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'operator', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {condition.target === 'user' ? (
+                              <>
+                                <SelectItem value="EQ">= (같음)</SelectItem>
+                              </>
+                            ) : condition.attribute === 'category' ? (
+                              <>
+                                <SelectItem value="IN_CATEGORY">포함</SelectItem>
+                              </>
+                            ) : (
+                              <>
+                                <SelectItem value="GTE">&gt;= (이상)</SelectItem>
+                                <SelectItem value="LTE">&lt;= (이하)</SelectItem>
+                                <SelectItem value="EQ">= (같음)</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {/* 값 입력 필드 */}
+                      {condition.target === 'user' ? (
+                        condition.attribute === 'membershipTier' ? (
+                          <Select
+                            value={condition.value}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="bronze">🥉 브론즈</SelectItem>
+                              <SelectItem value="silver">🥈 실버</SelectItem>
+                              <SelectItem value="gold">🥇 골드</SelectItem>
+                              <SelectItem value="vip">💎 VIP</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Select
+                            value={condition.value}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="true">✨ 신규 회원</SelectItem>
+                              <SelectItem value="false">👤 기존 회원</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )
+                      ) : condition.attribute === 'category' ? (
+                        <Select
+                          value={condition.value}
+                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="skincare">스킨케어</SelectItem>
+                            <SelectItem value="makeup">메이크업</SelectItem>
+                            <SelectItem value="cleansing">클렌징</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : condition.attribute === 'product_quantity' ? (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select
+                            value={condition.productId || ''}
+                            onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'productId', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="상품 선택" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {products.map(p => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            type="number"
+                            placeholder="수량"
+                            value={condition.value}
+                            onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                          />
+                        </div>
+                      ) : (
+                        <Input
+                          type="number"
+                          placeholder="조건값 (예: 50000)"
+                          value={condition.value}
+                          onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
+                        />
+                      )}
+                      
+                      {/* 조건 삭제 버튼 */}
+                      {group.conditions.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeCondition(groupIndex, conditionIndex)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          조건 삭제
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* 조건 추가 버튼 */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addCondition(groupIndex)}
+                    className="flex items-center gap-2 w-full"
+                  >
+                    <span>+</span>
+                    조건 추가
+                  </Button>
+                </div>
+              </div>
+              ))}
+            </div>
+            
             <div className="p-4 border rounded-lg space-y-4">
               <Label>할인 대상 상품</Label>
               <Select
@@ -820,9 +1786,9 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
-        <Card className="max-h-[80vh] flex flex-col rounded-t-xl overflow-hidden">
+        <Card className="h-[85vh] flex flex-col rounded-t-xl overflow-hidden">
           <form onSubmit={handleSubmit} className="flex flex-col h-full">
-            <CardHeader className="flex-shrink-0 flex flex-row items-center justify-between">
+            <CardHeader className="flex-shrink-0 flex flex-row items-center justify-between border-b">
               <div className="flex items-center">
                 {step === 'configure' && (
                   <Button
@@ -856,8 +1822,8 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
                 <X className="h-4 w-4" />
               </Button>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-6">
+            <CardContent className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              <div className="space-y-6 min-h-0">
               {step === 'select_type' && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <button

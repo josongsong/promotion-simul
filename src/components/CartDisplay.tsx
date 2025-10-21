@@ -23,14 +23,24 @@ export function CartDisplay() {
         ) : (
           <div className="space-y-4">
             {items.map(item => (
-              <div key={item.product.id} className="flex justify-between items-start">
-                <div>
-                  <p className="font-medium">{item.product.name}</p>
+              <div key={item.product.id} className="flex gap-3 items-start">
+                <div className="flex-shrink-0">
+                  <img 
+                    src={item.product.image} 
+                    alt={item.product.name}
+                    className="w-12 h-12 object-cover rounded-md"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/48x48?text=No+Image'
+                    }}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm">{item.product.name}</p>
                   <p className="text-sm text-muted-foreground">
                     {item.quantity}개 x {item.product.price.toLocaleString()}원
                   </p>
                 </div>
-                <p className="font-semibold">
+                <p className="font-semibold text-sm">
                   {(item.product.price * item.quantity).toLocaleString()}원
                 </p>
               </div>

@@ -19,6 +19,8 @@ export interface User {
   name: string
   membershipTier: 'bronze' | 'silver' | 'gold' | 'vip'
   isNewUser: boolean
+  region: string
+  age: number
 }
 
 export interface Condition {
@@ -92,15 +94,16 @@ interface PromotionState {
   calculateCart: () => void
 }
 
-// Mock data
+// Mock data - 50개 상품, 카테고리별 분류
 const mockProducts: Product[] = [
+  // 스킨케어 (20개)
   { 
     id: 'prod_101', 
     name: '라운드랩 자작나무 수분 선크림', 
     price: 25000, 
     category: 'skincare', 
     tags: ['sunscreen', 'moisture'],
-    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=1'
   },
   { 
     id: 'prod_102', 
@@ -108,31 +111,7 @@ const mockProducts: Product[] = [
     price: 2000, 
     category: 'skincare', 
     tags: ['mask', 'soothing'],
-    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
-  },
-  { 
-    id: 'prod_103', 
-    name: '클리오 킬커버 파운웨어 쿠션', 
-    price: 32000, 
-    category: 'makeup', 
-    tags: ['cushion', 'best-seller'],
-    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&h=300&fit=crop&crop=center'
-  },
-  { 
-    id: 'prod_104', 
-    name: '롬앤 쥬시 래스팅 틴트', 
-    price: 9900, 
-    category: 'makeup', 
-    tags: ['tint', 'lip'],
-    image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=300&h=300&fit=crop&crop=center'
-  },
-  { 
-    id: 'prod_105', 
-    name: '바닐라코 클린 잇 제로 클렌징 밤', 
-    price: 18000, 
-    category: 'cleansing', 
-    tags: ['cleanser', 'best-seller'],
-    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=2'
   },
   { 
     id: 'prod_106', 
@@ -140,7 +119,7 @@ const mockProducts: Product[] = [
     price: 27000, 
     category: 'skincare', 
     tags: ['serum', 'moisture'],
-    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=3'
   },
   { 
     id: 'prod_107', 
@@ -148,15 +127,7 @@ const mockProducts: Product[] = [
     price: 15000, 
     category: 'skincare', 
     tags: ['toner', 'soothing'],
-    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
-  },
-  { 
-    id: 'prod_108', 
-    name: '페리페라 잉크 더 에어리 벨벳', 
-    price: 9000, 
-    category: 'makeup', 
-    tags: ['tint', 'lip', 'velvet'],
-    image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=4'
   },
   { 
     id: 'prod_109', 
@@ -164,7 +135,7 @@ const mockProducts: Product[] = [
     price: 24000, 
     category: 'skincare', 
     tags: ['toner-pad', 'soothing'],
-    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=5'
   },
   { 
     id: 'prod_110', 
@@ -172,7 +143,7 @@ const mockProducts: Product[] = [
     price: 48000, 
     category: 'skincare', 
     tags: ['cream', 'cicapair'],
-    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=6'
   },
   { 
     id: 'prod_111', 
@@ -180,15 +151,7 @@ const mockProducts: Product[] = [
     price: 22000, 
     category: 'skincare', 
     tags: ['sunscreen', 'men'],
-    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
-  },
-  { 
-    id: 'prod_112', 
-    name: '헤라 센슈얼 파우더 매트', 
-    price: 35000, 
-    category: 'makeup', 
-    tags: ['powder', 'matte'],
-    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=7'
   },
   { 
     id: 'prod_113', 
@@ -196,15 +159,7 @@ const mockProducts: Product[] = [
     price: 120000, 
     category: 'skincare', 
     tags: ['cream', 'luxury'],
-    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
-  },
-  { 
-    id: 'prod_114', 
-    name: '에뛰드하우스 블러 퍼펙트 쿠션', 
-    price: 18000, 
-    category: 'makeup', 
-    tags: ['cushion', 'blur'],
-    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=8'
   },
   { 
     id: 'prod_115', 
@@ -212,7 +167,341 @@ const mockProducts: Product[] = [
     price: 28000, 
     category: 'skincare', 
     tags: ['cream', 'hydration'],
-    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=300&h=300&fit=crop&crop=center'
+    image: 'https://picsum.photos/300/300?random=9'
+  },
+  { 
+    id: 'prod_116', 
+    name: '숨37도 수분크림', 
+    price: 35000, 
+    category: 'skincare', 
+    tags: ['cream', 'moisture'],
+    image: 'https://picsum.photos/300/300?random=10'
+  },
+  { 
+    id: 'prod_117', 
+    name: '헤라 셀리니언 에센스', 
+    price: 45000, 
+    category: 'skincare', 
+    tags: ['essence', 'anti-aging'],
+    image: 'https://picsum.photos/300/300?random=11'
+  },
+  { 
+    id: 'prod_118', 
+    name: '설화수 자음생 에센스', 
+    price: 85000, 
+    category: 'skincare', 
+    tags: ['essence', 'luxury'],
+    image: 'https://picsum.photos/300/300?random=12'
+  },
+  { 
+    id: 'prod_119', 
+    name: '아토팜 베이비 로션', 
+    price: 18000, 
+    category: 'skincare', 
+    tags: ['lotion', 'baby'],
+    image: 'https://picsum.photos/300/300?random=13'
+  },
+  { 
+    id: 'prod_120', 
+    name: '닥터지 레드 블레미쉬 클리어 수딩 젤', 
+    price: 19000, 
+    category: 'skincare', 
+    tags: ['gel', 'acne'],
+    image: 'https://picsum.photos/300/300?random=14'
+  },
+  { 
+    id: 'prod_121', 
+    name: '이니스프리 그린티 씨드 아이크림', 
+    price: 22000, 
+    category: 'skincare', 
+    tags: ['eye-cream', 'moisture'],
+    image: 'https://picsum.photos/300/300?random=15'
+  },
+  { 
+    id: 'prod_122', 
+    name: '라운드랩 1025 독도 토너', 
+    price: 18000, 
+    category: 'skincare', 
+    tags: ['toner', 'moisture'],
+    image: 'https://picsum.photos/300/300?random=16'
+  },
+  { 
+    id: 'prod_123', 
+    name: '아토팜 베이비 크림', 
+    price: 20000, 
+    category: 'skincare', 
+    tags: ['cream', 'baby'],
+    image: 'https://picsum.photos/300/300?random=17'
+  },
+  { 
+    id: 'prod_124', 
+    name: '닥터지 레드 블레미쉬 클리어 크림', 
+    price: 21000, 
+    category: 'skincare', 
+    tags: ['cream', 'acne'],
+    image: 'https://picsum.photos/300/300?random=18'
+  },
+  { 
+    id: 'prod_125', 
+    name: '라네즈 워터뱅크 하이드로 에센스', 
+    price: 32000, 
+    category: 'skincare', 
+    tags: ['essence', 'hydration'],
+    image: 'https://picsum.photos/300/300?random=19'
+  },
+  { 
+    id: 'prod_126', 
+    name: '아비브 어성초 77 스킨', 
+    price: 15000, 
+    category: 'skincare', 
+    tags: ['toner', 'soothing'],
+    image: 'https://picsum.photos/300/300?random=20'
+  },
+
+  // 메이크업 (15개)
+  { 
+    id: 'prod_103', 
+    name: '클리오 킬커버 파운웨어 쿠션', 
+    price: 32000, 
+    category: 'makeup', 
+    tags: ['cushion', 'best-seller'],
+    image: 'https://picsum.photos/300/300?random=21'
+  },
+  { 
+    id: 'prod_104', 
+    name: '롬앤 쥬시 래스팅 틴트', 
+    price: 9900, 
+    category: 'makeup', 
+    tags: ['tint', 'lip'],
+    image: 'https://picsum.photos/300/300?random=22'
+  },
+  { 
+    id: 'prod_108', 
+    name: '페리페라 잉크 더 에어리 벨벳', 
+    price: 9000, 
+    category: 'makeup', 
+    tags: ['tint', 'lip', 'velvet'],
+    image: 'https://picsum.photos/300/300?random=23'
+  },
+  { 
+    id: 'prod_112', 
+    name: '헤라 센슈얼 파우더 매트', 
+    price: 35000, 
+    category: 'makeup', 
+    tags: ['powder', 'matte'],
+    image: 'https://picsum.photos/300/300?random=24'
+  },
+  { 
+    id: 'prod_114', 
+    name: '에뛰드하우스 블러 퍼펙트 쿠션', 
+    price: 18000, 
+    category: 'makeup', 
+    tags: ['cushion', 'blur'],
+    image: 'https://picsum.photos/300/300?random=25'
+  },
+  { 
+    id: 'prod_127', 
+    name: '아이오페 에어 쿠션', 
+    price: 25000, 
+    category: 'makeup', 
+    tags: ['cushion', 'coverage'],
+    image: 'https://picsum.photos/300/300?random=26'
+  },
+  { 
+    id: 'prod_128', 
+    name: '헤라 블랙 쿠션', 
+    price: 45000, 
+    category: 'makeup', 
+    tags: ['cushion', 'luxury'],
+    image: 'https://picsum.photos/300/300?random=27'
+  },
+  { 
+    id: 'prod_129', 
+    name: '설화수 쿠션 컴팩트', 
+    price: 55000, 
+    category: 'makeup', 
+    tags: ['cushion', 'luxury'],
+    image: 'https://picsum.photos/300/300?random=28'
+  },
+  { 
+    id: 'prod_130', 
+    name: '클리오 킬커버 파운데이션', 
+    price: 28000, 
+    category: 'makeup', 
+    tags: ['foundation', 'coverage'],
+    image: 'https://picsum.photos/300/300?random=29'
+  },
+  { 
+    id: 'prod_131', 
+    name: '에뛰드하우스 더블웨어 스테이', 
+    price: 22000, 
+    category: 'makeup', 
+    tags: ['foundation', 'long-lasting'],
+    image: 'https://picsum.photos/300/300?random=30'
+  },
+  { 
+    id: 'prod_132', 
+    name: '롬앤 베러 댄 치크', 
+    price: 12000, 
+    category: 'makeup', 
+    tags: ['blush', 'cheek'],
+    image: 'https://picsum.photos/300/300?random=31'
+  },
+  { 
+    id: 'prod_133', 
+    name: '아이오페 아이섀도우', 
+    price: 15000, 
+    category: 'makeup', 
+    tags: ['eyeshadow', 'eye'],
+    image: 'https://picsum.photos/300/300?random=32'
+  },
+  { 
+    id: 'prod_134', 
+    name: '헤라 센슈얼 파우더 아이섀도우', 
+    price: 25000, 
+    category: 'makeup', 
+    tags: ['eyeshadow', 'luxury'],
+    image: 'https://picsum.photos/300/300?random=33'
+  },
+  { 
+    id: 'prod_135', 
+    name: '페리페라 잉크 더 벨벳', 
+    price: 11000, 
+    category: 'makeup', 
+    tags: ['lipstick', 'velvet'],
+    image: 'https://picsum.photos/300/300?random=34'
+  },
+  { 
+    id: 'prod_136', 
+    name: '롬앤 쥬시 래스팅 글로스', 
+    price: 8000, 
+    category: 'makeup', 
+    tags: ['gloss', 'lip'],
+    image: 'https://picsum.photos/300/300?random=35'
+  },
+
+  // 클렌징 (10개)
+  { 
+    id: 'prod_105', 
+    name: '바닐라코 클린 잇 제로 클렌징 밤', 
+    price: 18000, 
+    category: 'cleansing', 
+    tags: ['cleanser', 'best-seller'],
+    image: 'https://picsum.photos/300/300?random=36'
+  },
+  { 
+    id: 'prod_137', 
+    name: '라운드랩 1025 독도 클렌징 폼', 
+    price: 15000, 
+    category: 'cleansing', 
+    tags: ['foam', 'cleanser'],
+    image: 'https://picsum.photos/300/300?random=37'
+  },
+  { 
+    id: 'prod_138', 
+    name: '닥터지 레드 블레미쉬 클리어 폼', 
+    price: 16000, 
+    category: 'cleansing', 
+    tags: ['foam', 'acne'],
+    image: 'https://picsum.photos/300/300?random=38'
+  },
+  { 
+    id: 'prod_139', 
+    name: '아토팜 베이비 클렌징 폼', 
+    price: 12000, 
+    category: 'cleansing', 
+    tags: ['foam', 'baby'],
+    image: 'https://picsum.photos/300/300?random=39'
+  },
+  { 
+    id: 'prod_140', 
+    name: '이니스프리 그린티 씨드 클렌징 폼', 
+    price: 13000, 
+    category: 'cleansing', 
+    tags: ['foam', 'natural'],
+    image: 'https://picsum.photos/300/300?random=40'
+  },
+  { 
+    id: 'prod_141', 
+    name: '헤라 센슈얼 파우더 클렌징 밤', 
+    price: 25000, 
+    category: 'cleansing', 
+    tags: ['balm', 'luxury'],
+    image: 'https://picsum.photos/300/300?random=41'
+  },
+  { 
+    id: 'prod_142', 
+    name: '설화수 자음생 클렌징 폼', 
+    price: 35000, 
+    category: 'cleansing', 
+    tags: ['foam', 'luxury'],
+    image: 'https://picsum.photos/300/300?random=42'
+  },
+  { 
+    id: 'prod_143', 
+    name: '라네즈 워터뱅크 클렌징 폼', 
+    price: 18000, 
+    category: 'cleansing', 
+    tags: ['foam', 'hydration'],
+    image: 'https://picsum.photos/300/300?random=43'
+  },
+  { 
+    id: 'prod_144', 
+    name: '아비브 어성초 클렌징 폼', 
+    price: 14000, 
+    category: 'cleansing', 
+    tags: ['foam', 'soothing'],
+    image: 'https://picsum.photos/300/300?random=44'
+  },
+  { 
+    id: 'prod_145', 
+    name: '에뛰드하우스 순정 클렌징 폼', 
+    price: 11000, 
+    category: 'cleansing', 
+    tags: ['foam', 'gentle'],
+    image: 'https://picsum.photos/300/300?random=45'
+  },
+
+  // 바디케어 (5개)
+  { 
+    id: 'prod_146', 
+    name: '아토팜 베이비 로션 500ml', 
+    price: 25000, 
+    category: 'bodycare', 
+    tags: ['lotion', 'baby', 'large'],
+    image: 'https://picsum.photos/300/300?random=46'
+  },
+  { 
+    id: 'prod_147', 
+    name: '라네즈 워터뱅크 바디로션', 
+    price: 18000, 
+    category: 'bodycare', 
+    tags: ['lotion', 'hydration'],
+    image: 'https://picsum.photos/300/300?random=47'
+  },
+  { 
+    id: 'prod_148', 
+    name: '이니스프리 그린티 바디워시', 
+    price: 12000, 
+    category: 'bodycare', 
+    tags: ['bodywash', 'natural'],
+    image: 'https://picsum.photos/300/300?random=48'
+  },
+  { 
+    id: 'prod_149', 
+    name: '닥터지 레드 블레미쉬 바디로션', 
+    price: 20000, 
+    category: 'bodycare', 
+    tags: ['lotion', 'acne'],
+    image: 'https://picsum.photos/300/300?random=49'
+  },
+  { 
+    id: 'prod_150', 
+    name: '헤라 센슈얼 파우더 바디크림', 
+    price: 30000, 
+    category: 'bodycare', 
+    tags: ['cream', 'luxury'],
+    image: 'https://picsum.photos/300/300?random=50'
   }
 ]
 
@@ -221,6 +510,8 @@ const mockUser: User = {
   name: '김혜인',
   membershipTier: 'gold',
   isNewUser: false,
+  region: 'CA',
+  age: 28
 }
 
 // Promotion engine logic
@@ -250,6 +541,14 @@ function checkCondition(condition: Condition, cart: Cart, user: User): boolean {
       if (attribute === 'isNewUser') {
         if (operator === 'EQ') return user.isNewUser === (value === 'true')
       }
+      if (attribute === 'region') {
+        if (operator === 'EQ') return user.region === value
+      }
+      if (attribute === 'age') {
+        if (operator === 'GTE') return user.age >= parseInt(value, 10)
+        if (operator === 'LTE') return user.age <= parseInt(value, 10)
+        if (operator === 'EQ') return user.age === parseInt(value, 10)
+      }
       break
     case 'product':
       if (attribute === 'category') {
@@ -275,11 +574,18 @@ function applyPromotions(cartItems: CartItem[], user: User, promotions: Promotio
     .filter(promo => {
       const { conditionGroups = [], groupOperator = 'AND' } = promo
       if (!conditionGroups || conditionGroups.length === 0) return true
+      
+      // 각 조건 그룹 내의 조건들은 AND로 연결 (모든 조건이 만족되어야 함)
       const groupResults = conditionGroups.map(group => 
         group.conditions.every(cond => checkCondition(cond, initialCartState, user))
       )
-      if (groupOperator === 'AND') return groupResults.every(res => res === true)
-      else return groupResults.some(res => res === true)
+      
+      // 조건 그룹 간의 연산자에 따라 결과 결정
+      if (groupOperator === 'AND') {
+        return groupResults.every(res => res === true)
+      } else { // OR
+        return groupResults.some(res => res === true)
+      }
     })
     .sort((a, b) => a.priority - b.priority)
 
