@@ -10,7 +10,7 @@ export function UserProfile() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>회원 정보 시뮬레이션</CardTitle>
+        <CardTitle>회원 정보</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

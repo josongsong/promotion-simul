@@ -182,289 +182,173 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
           />
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>프로모션 조건</Label>
-              <p className="text-xs text-muted-foreground mt-1">
-                복잡한 조건을 설정하여 정교한 프로모션을 만들 수 있습니다
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Select
-                value={newPromo.groupOperator}
-                onValueChange={(value) => setNewPromo(p => ({ ...p, groupOperator: value as 'AND' | 'OR' }))}
-              >
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="AND">🔗 AND (모두 만족)</SelectItem>
-                  <SelectItem value="OR">🔀 OR (하나라도 만족)</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button type="button" variant="outline" size="sm" onClick={addConditionGroup}>
-                + 그룹 추가
-              </Button>
-            </div>
-          </div>
-
-          {newPromo.conditionGroups.length > 1 && (
-            <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-medium text-blue-700 dark:text-blue-300">
-                  조건 그룹 연산자: {newPromo.groupOperator === 'AND' ? '🔗 AND (모두 만족)' : '🔀 OR (하나라도 만족)'}
-                </span>
-              </div>
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                {newPromo.groupOperator === 'AND' 
-                  ? '모든 조건 그룹이 만족되어야 프로모션이 적용됩니다'
-                  : '하나라도 조건 그룹이 만족되면 프로모션이 적용됩니다'
-                }
-              </p>
-            </div>
-          )}
-
-          {newPromo.conditionGroups.map((group, groupIndex) => (
-            <div key={group.id} className="p-4 border rounded-lg space-y-3 bg-gray-50 dark:bg-gray-900/50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">조건 그룹 {groupIndex + 1}</Label>
-                  <p className="text-xs text-muted-foreground">
-                    이 그룹 내의 모든 조건이 만족되어야 합니다
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => addCondition(groupIndex)}
-                  >
-                    + 조건 추가
-                  </Button>
-                  {newPromo.conditionGroups.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeConditionGroup(groupIndex)}
-                    >
-                      그룹 삭제
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {group.conditions.map((condition, conditionIndex) => (
-                <div key={conditionIndex} className="p-3 bg-white dark:bg-gray-800 rounded-lg border space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      조건 {conditionIndex + 1}
-                    </span>
-                    {group.conditions.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => removeCondition(groupIndex, conditionIndex)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    )}
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1">대상</Label>
-                      <Select
-                        value={condition.target}
-                        onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'target', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="cart">🛒 장바구니</SelectItem>
-                          <SelectItem value="user">👤 사용자</SelectItem>
-                          <SelectItem value="product">📦 상품</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1">속성</Label>
-                      <Select
-                        value={condition.attribute}
-                        onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'attribute', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {condition.target === 'user' ? (
-                            <>
-                              <SelectItem value="membershipTier">회원 등급</SelectItem>
-                              <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
-                            </>
-                          ) : condition.target === 'cart' ? (
-                            <>
-                              <SelectItem value="subtotal">총액</SelectItem>
-                              <SelectItem value="item_count">상품 수량</SelectItem>
-                              <SelectItem value="product_quantity">특정 상품 수량</SelectItem>
-                            </>
-                          ) : condition.target === 'product' ? (
-                            <>
-                              <SelectItem value="category">카테고리</SelectItem>
-                            </>
-                          ) : null}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1">연산자</Label>
-                      <Select
-                        value={condition.operator}
-                        onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'operator', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {condition.target === 'user' ? (
-                            <>
-                              <SelectItem value="EQ">= (같음)</SelectItem>
-                            </>
-                          ) : condition.target === 'product' && condition.attribute === 'category' ? (
-                            <>
-                              <SelectItem value="IN_CATEGORY">포함</SelectItem>
-                            </>
-                          ) : (
-                            <>
-                              <SelectItem value="GTE">&gt;= (이상)</SelectItem>
-                              <SelectItem value="LTE">&lt;= (이하)</SelectItem>
-                              <SelectItem value="EQ">= (같음)</SelectItem>
-                            </>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-1">값</Label>
-                    {condition.target === 'user' ? (
-                      condition.attribute === 'membershipTier' ? (
-                        <Select
-                          value={condition.value}
-                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="등급 선택" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="bronze">🥉 브론즈</SelectItem>
-                            <SelectItem value="silver">🥈 실버</SelectItem>
-                            <SelectItem value="gold">🥇 골드</SelectItem>
-                            <SelectItem value="vip">💎 VIP</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Select
-                          value={condition.value}
-                          onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="선택" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="true">✨ 신규 회원</SelectItem>
-                            <SelectItem value="false">👤 기존 회원</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )
-                    ) : condition.target === 'product' && condition.attribute === 'category' ? (
-                      <Select
-                        value={condition.value}
-                        onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'value', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="카테고리 선택" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="skincare">🧴 스킨케어</SelectItem>
-                          <SelectItem value="makeup">💄 메이크업</SelectItem>
-                          <SelectItem value="cleansing">🧼 클렌징</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    ) : condition.attribute === 'product_quantity' ? (
-                      <Select
-                        value={condition.productId || ''}
-                        onValueChange={(value) => updateCondition(groupIndex, conditionIndex, 'productId', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="상품 선택" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {products.map(p => (
-                            <SelectItem key={p.id} value={p.id}>
-                              {p.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <Input
-                        type="number"
-                        placeholder={
-                          condition.attribute === 'subtotal' ? '예: 50000' :
-                          condition.attribute === 'item_count' ? '예: 3' : '값 입력'
-                        }
-                        value={condition.value}
-                        onChange={(e) => updateCondition(groupIndex, conditionIndex, 'value', e.target.value)}
-                      />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
         
-        {/* 프로모션 타입별 액션 설정 */}
+        {/* 프로모션 타입별 조건 및 액션 설정 */}
         {selectedType === 'discount' && (
-          <div className="p-4 border rounded-lg space-y-4">
-            <Label>할인 내용</Label>
-            <div className="grid grid-cols-2 gap-2">
-              <Select
-                value={newPromo.actions[0]?.type || 'CART_FIXED_DISCOUNT'}
-                onValueChange={(value) => {
-                  const updatedActions = [...newPromo.actions]
-                  updatedActions[0].type = value as any
-                  setNewPromo(p => ({ ...p, actions: updatedActions }))
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CART_FIXED_DISCOUNT">금액 할인(원)</SelectItem>
-                  <SelectItem value="CART_PERCENT_DISCOUNT">비율 할인(%)</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input
-                type="number"
-                placeholder="할인 값 (예: 5000, 10)"
-                value={newPromo.actions[0]?.value || ''}
-                onChange={(e) => {
-                  const updatedActions = [...newPromo.actions]
-                  updatedActions[0].value = e.target.value
-                  setNewPromo(p => ({ ...p, actions: updatedActions }))
-                }}
-                required
-              />
+          <div className="space-y-6">
+            <div className="p-4 border rounded-lg space-y-4">
+              <Label>할인 조건</Label>
+              <div className="grid grid-cols-3 gap-2">
+                <Select
+                  value={newPromo.conditionGroups[0]?.conditions[0]?.target || 'cart'}
+                  onValueChange={(value) => {
+                    const updatedGroups = [...newPromo.conditionGroups]
+                    updatedGroups[0].conditions[0].target = value as any
+                    if (value === 'user') {
+                      updatedGroups[0].conditions[0].attribute = 'membershipTier'
+                      updatedGroups[0].conditions[0].operator = 'EQ'
+                    } else if (value === 'cart') {
+                      updatedGroups[0].conditions[0].attribute = 'subtotal'
+                      updatedGroups[0].conditions[0].operator = 'GTE'
+                    }
+                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cart">🛒 장바구니</SelectItem>
+                    <SelectItem value="user">👤 사용자</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select
+                  value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'}
+                  onValueChange={(value) => {
+                    const updatedGroups = [...newPromo.conditionGroups]
+                    updatedGroups[0].conditions[0].attribute = value
+                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
+                      <>
+                        <SelectItem value="membershipTier">회원 등급</SelectItem>
+                        <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="subtotal">총액</SelectItem>
+                        <SelectItem value="item_count">상품 수량</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+                
+                <Select
+                  value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'}
+                  onValueChange={(value) => {
+                    const updatedGroups = [...newPromo.conditionGroups]
+                    updatedGroups[0].conditions[0].operator = value as any
+                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
+                      <>
+                        <SelectItem value="EQ">= (같음)</SelectItem>
+                      </>
+                    ) : (
+                      <>
+                        <SelectItem value="GTE">&gt;= (이상)</SelectItem>
+                        <SelectItem value="LTE">&lt;= (이하)</SelectItem>
+                      </>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
+                newPromo.conditionGroups[0]?.conditions[0]?.attribute === 'membershipTier' ? (
+                  <Select
+                    value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'bronze'}
+                    onValueChange={(value) => {
+                      const updatedGroups = [...newPromo.conditionGroups]
+                      updatedGroups[0].conditions[0].value = value
+                      setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bronze">🥉 브론즈</SelectItem>
+                      <SelectItem value="silver">🥈 실버</SelectItem>
+                      <SelectItem value="gold">🥇 골드</SelectItem>
+                      <SelectItem value="vip">💎 VIP</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Select
+                    value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'true'}
+                    onValueChange={(value) => {
+                      const updatedGroups = [...newPromo.conditionGroups]
+                      updatedGroups[0].conditions[0].value = value
+                      setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">✨ 신규 회원</SelectItem>
+                      <SelectItem value="false">👤 기존 회원</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )
+              ) : (
+                <Input
+                  type="number"
+                  placeholder="조건값 (예: 50000)"
+                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''}
+                  onChange={(e) => {
+                    const updatedGroups = [...newPromo.conditionGroups]
+                    updatedGroups[0].conditions[0].value = e.target.value
+                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                  }}
+                  required
+                />
+              )}
+            </div>
+            
+            <div className="p-4 border rounded-lg space-y-4">
+              <Label>할인 내용</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Select
+                  value={newPromo.actions[0]?.type || 'CART_FIXED_DISCOUNT'}
+                  onValueChange={(value) => {
+                    const updatedActions = [...newPromo.actions]
+                    updatedActions[0].type = value as any
+                    setNewPromo(p => ({ ...p, actions: updatedActions }))
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CART_FIXED_DISCOUNT">금액 할인(원)</SelectItem>
+                    <SelectItem value="CART_PERCENT_DISCOUNT">비율 할인(%)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  type="number"
+                  placeholder="할인 값 (예: 5000, 10)"
+                  value={newPromo.actions[0]?.value || ''}
+                  onChange={(e) => {
+                    const updatedActions = [...newPromo.actions]
+                    updatedActions[0].value = e.target.value
+                    setNewPromo(p => ({ ...p, actions: updatedActions }))
+                  }}
+                  required
+                />
+              </div>
             </div>
           </div>
         )}
@@ -492,46 +376,36 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cart">장바구니</SelectItem>
-                  <SelectItem value="user">사용자</SelectItem>
+                  <SelectItem value="cart">🛒 장바구니</SelectItem>
+                  <SelectItem value="user">👤 사용자</SelectItem>
                 </SelectContent>
               </Select>
               
-              {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'membershipTier'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].attribute = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="membershipTier">회원 등급</SelectItem>
-                    <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].attribute = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="subtotal">장바구니 총액</SelectItem>
-                    <SelectItem value="item_count">상품 수량</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
+              <Select
+                value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'}
+                onValueChange={(value) => {
+                  const updatedGroups = [...newPromo.conditionGroups]
+                  updatedGroups[0].conditions[0].attribute = value
+                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
+                    <>
+                      <SelectItem value="membershipTier">회원 등급</SelectItem>
+                      <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
+                    </>
+                  ) : (
+                    <>
+                      <SelectItem value="subtotal">장바구니 총액</SelectItem>
+                      <SelectItem value="item_count">상품 수량</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
               
               <Select
                 value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'}
@@ -573,10 +447,10 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="bronze">브론즈</SelectItem>
-                    <SelectItem value="silver">실버</SelectItem>
-                    <SelectItem value="gold">골드</SelectItem>
-                    <SelectItem value="vip">VIP</SelectItem>
+                    <SelectItem value="bronze">🥉 브론즈</SelectItem>
+                    <SelectItem value="silver">🥈 실버</SelectItem>
+                    <SelectItem value="gold">🥇 골드</SelectItem>
+                    <SelectItem value="vip">💎 VIP</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
@@ -592,8 +466,8 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">신규 회원</SelectItem>
-                    <SelectItem value="false">기존 회원</SelectItem>
+                    <SelectItem value="true">✨ 신규 회원</SelectItem>
+                    <SelectItem value="false">👤 기존 회원</SelectItem>
                   </SelectContent>
                 </Select>
               )
@@ -780,158 +654,49 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
         )}
         
         {selectedType === 'bogo' && (
-          <div className="p-4 border rounded-lg space-y-4">
-            <Label>BOGO 조건 (Buy)</Label>
-            <div className="grid grid-cols-3 gap-2">
-              <Select
-                value={newPromo.conditionGroups[0]?.conditions[0]?.target || 'cart'}
-                onValueChange={(value) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].target = value as any
-                  if (value === 'user') {
-                    updatedGroups[0].conditions[0].attribute = 'membershipTier'
-                    updatedGroups[0].conditions[0].operator = 'EQ'
-                  } else if (value === 'cart') {
-                    updatedGroups[0].conditions[0].attribute = 'product_quantity'
-                    updatedGroups[0].conditions[0].operator = 'GTE'
-                  }
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cart">장바구니</SelectItem>
-                  <SelectItem value="user">사용자</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
+          <div className="space-y-6">
+            <div className="p-4 border rounded-lg space-y-4">
+              <Label>BOGO 조건 (Buy)</Label>
+              <div className="grid grid-cols-2 gap-2">
                 <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'membershipTier'}
+                  value={newPromo.conditionGroups[0]?.conditions[0]?.productId || ''}
                   onValueChange={(value) => {
+                    const selectedProduct = products.find(p => p.id === value)
                     const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].attribute = value
+                    updatedGroups[0].conditions[0].productId = value
                     setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                    
+                    const updatedActions = [...newPromo.actions]
+                    updatedActions[0].value = selectedProduct ? selectedProduct.price.toString() : '0'
+                    setNewPromo(prev => ({ ...prev, actions: updatedActions }))
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="상품 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="membershipTier">회원 등급</SelectItem>
-                    <SelectItem value="isNewUser">신규 회원 여부</SelectItem>
+                    {products.map(p => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-              ) : (
-                <div className="col-span-2">
-                  <Select
-                    value={newPromo.conditionGroups[0]?.conditions[0]?.productId || ''}
-                    onValueChange={(value) => {
-                      const selectedProduct = products.find(p => p.id === value)
-                      const updatedGroups = [...newPromo.conditionGroups]
-                      updatedGroups[0].conditions[0].productId = value
-                      setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                      
-                      const updatedActions = [...newPromo.actions]
-                      updatedActions[0].value = selectedProduct ? selectedProduct.price.toString() : '0'
-                      setNewPromo(prev => ({ ...prev, actions: updatedActions }))
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="상품 선택" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {products.map(p => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {p.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              
-              <Select
-                value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'}
-                onValueChange={(value) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].operator = value as any
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-                    <>
-                      <SelectItem value="EQ">= (같음)</SelectItem>
-                    </>
-                  ) : (
-                    <>
-                      <SelectItem value="GTE">&gt;= (이상)</SelectItem>
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
+                <Input
+                  type="number"
+                  placeholder="구매 수량 (예: 2)"
+                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''}
+                  onChange={(e) => {
+                    const updatedGroups = [...newPromo.conditionGroups]
+                    updatedGroups[0].conditions[0].value = e.target.value
+                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
+                  }}
+                  required
+                />
+              </div>
             </div>
             
-            {newPromo.conditionGroups[0]?.conditions[0]?.target === 'user' ? (
-              newPromo.conditionGroups[0]?.conditions[0]?.attribute === 'membershipTier' ? (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'bronze'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].value = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="bronze">브론즈</SelectItem>
-                    <SelectItem value="silver">실버</SelectItem>
-                    <SelectItem value="gold">골드</SelectItem>
-                    <SelectItem value="vip">VIP</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Select
-                  value={newPromo.conditionGroups[0]?.conditions[0]?.value || 'true'}
-                  onValueChange={(value) => {
-                    const updatedGroups = [...newPromo.conditionGroups]
-                    updatedGroups[0].conditions[0].value = value
-                    setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="true">신규 회원</SelectItem>
-                    <SelectItem value="false">기존 회원</SelectItem>
-                  </SelectContent>
-                </Select>
-              )
-            ) : (
-              <Input
-                type="number"
-                placeholder="구매 수량 (예: 2)"
-                value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''}
-                onChange={(e) => {
-                  const updatedGroups = [...newPromo.conditionGroups]
-                  updatedGroups[0].conditions[0].value = e.target.value
-                  setNewPromo(p => ({ ...p, conditionGroups: updatedGroups }))
-                }}
-                required
-              />
-            )}
-            
-            <Separator />
-            <div className="pt-4 space-y-2">
+            <div className="p-4 border rounded-lg space-y-2">
               <Label>BOGO 혜택 (Get)</Label>
               <p className="text-sm">
                 1개 상품 금액({(newPromo.actions[0]?.value || 0).toLocaleString()}원)이 할인됩니다.
@@ -1198,13 +963,13 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
         onClick={resetAndClose}
       />
       <div
-        className={`fixed inset-0 z-50 transition-transform transform ${
+        className={`fixed bottom-0 left-0 right-0 z-50 transition-transform transform ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
-        <Card className="h-full flex flex-col rounded-none">
-          <form onSubmit={handleSubmit}>
-            <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="max-h-[80vh] flex flex-col rounded-t-xl overflow-hidden">
+          <form onSubmit={handleSubmit} className="flex flex-col h-full">
+            <CardHeader className="flex-shrink-0 flex flex-row items-center justify-between">
               <div className="flex items-center">
                 {step === 'configure' && (
                   <Button
@@ -1288,7 +1053,7 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
               </div>
             </CardContent>
             {step === 'configure' && (
-              <CardFooter className="bg-muted/50 border-t">
+              <CardFooter className="bg-muted/50 border-t flex-shrink-0">
                 <Button type="submit" className="w-full">
                   프로모션 저장
                 </Button>

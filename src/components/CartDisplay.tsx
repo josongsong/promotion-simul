@@ -40,9 +40,11 @@ export function CartDisplay() {
       </CardContent>
       {items.length > 0 && (
         <CardFooter className="flex-col items-stretch space-y-4 bg-muted/50 rounded-b-lg">
-          <div className="flex justify-between text-md">
-            <span>주문 금액</span>
-            <span>{subtotal.toLocaleString()}원</span>
+          <div className="pt-4">
+            <div className="flex justify-between text-md">
+              <span>주문 금액</span>
+              <span>{subtotal.toLocaleString()}원</span>
+            </div>
           </div>
           {appliedPromotions.map(promo => (
             <div key={promo.promotionId} className="flex justify-between text-md items-start">
