@@ -1,0 +1,481 @@
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { PlusCircle, Trash2, ShoppingCart, X, ArrowLeft, Percent, Gift, Truck, Package, TrendingUp, ChevronsUpDown } from 'lucide-react';
+
+// ShadCN-like Components (Self-contained for single-file execution)
+const Card = ({ children, className = '' }) => <div className={`bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm ${className}`}>{children}</div>;
+const CardHeader = ({ children, className = '' }) => <div className={`p-6 border-b border-zinc-200 dark:border-zinc-800 ${className}`}>{children}</div>;
+const CardTitle = ({ children, className = '' }) => <h3 className={`text-lg font-semibold text-zinc-900 dark:text-zinc-100 ${className}`}>{children}</h3>;
+const CardDescription = ({ children, className = '' }) => <p className={`text-sm text-zinc-500 dark:text-zinc-400 ${className}`}>{children}</p>;
+const CardContent = ({ children, className = '' }) => <div className={`p-6 ${className}`}>{children}</div>;
+const CardFooter = ({ children, className = '' }) => <div className={`p-6 pt-0 flex items-center justify-end ${className}`}>{children}</div>;
+
+const Button = ({ children, variant = 'default', size = 'default', className = '', ...props }) => {
+    const variants = {
+        default: 'bg-zinc-900 text-zinc-50 hover:bg-zinc-900/90 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-50/90',
+        destructive: 'bg-red-500 text-zinc-50 hover:bg-red-500/90 dark:bg-red-900 dark:text-zinc-50 dark:hover:bg-red-900/90',
+        outline: 'border border-zinc-200 bg-transparent hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-50',
+        ghost: 'hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-50',
+    };
+    const sizes = {
+        default: 'h-10 px-4 py-2',
+        sm: 'h-9 rounded-md px-3',
+        icon: 'h-10 w-10',
+    };
+    return <button className={`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 disabled:pointer-events-none disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`} {...props}>{children}</button>;
+};
+
+const Label = (props) => <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-zinc-100" {...props} />;
+const Input = (props) => <input className="flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-950 dark:ring-offset-zinc-950 dark:placeholder:text-zinc-400 dark:focus-visible:ring-zinc-800" {...props} />;
+
+const Switch = ({ checked, onChange }) => (
+    <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)} className={`${checked ? 'bg-zinc-900 dark:bg-zinc-50' : 'bg-zinc-200 dark:bg-zinc-800'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2`}>
+        <span aria-hidden="true" className={`${checked ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}/>
+    </button>
+);
+const Separator = () => <hr className="border-zinc-200 dark:border-zinc-800" />;
+
+// Custom ShadCN-like Select component
+function CustomSelectItem({ children, value, onSelect }) {
+    return (
+        <button
+            type="button"
+            onClick={() => onSelect(value)}
+            className="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800"
+        >
+            {children}
+        </button>
+    );
+}
+
+function CustomSelect({ value, onValueChange, children, placeholder="옵션 선택..." }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [selectedLabel, setSelectedLabel] = useState(placeholder);
+    const triggerRef = useRef(null);
+    const contentRef = useRef(null);
+
+    useEffect(() => {
+        const childArray = React.Children.toArray(children);
+        const selectedChild = childArray.find(child => child.props.value === value);
+        setSelectedLabel(selectedChild ? selectedChild.props.children : placeholder);
+    }, [value, children, placeholder]);
+    
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (triggerRef.current && !triggerRef.current.contains(event.target) &&
+                contentRef.current && !contentRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleSelect = (newValue) => {
+        onValueChange(newValue);
+        setIsOpen(false);
+    };
+
+    return (
+        <div className="relative">
+            <button type="button" ref={triggerRef} onClick={() => setIsOpen(!isOpen)} className="flex h-10 w-full items-center justify-between rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-950 dark:ring-offset-zinc-950 dark:placeholder:text-zinc-400 dark:focus-visible:ring-zinc-800">
+                <span className="truncate">{selectedLabel}</span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </button>
+            {isOpen && (
+                <div ref={contentRef} className="absolute z-50 mt-1 w-full rounded-md border bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 shadow-md animate-in fade-in-0 zoom-in-95">
+                    <div className="p-1">
+                        {React.Children.map(children, child => 
+                            React.cloneElement(child, { onSelect: handleSelect })
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+// MOCK DATA AND TYPES
+const mockProducts = [
+  { id: 'prod_101', name: '라운드랩 자작나무 수분 선크림', price: 25000, category: 'skincare', tags: ['sunscreen', 'moisture'] },
+  { id: 'prod_102', name: '메디힐 티트리 에센셜 마스크', price: 2000, category: 'skincare', tags: ['mask', 'soothing'] },
+  { id: 'prod_103', name: '클리오 킬커버 파운웨어 쿠션', price: 32000, category: 'makeup', tags: ['cushion', 'best-seller'] },
+  { id: 'prod_104', name: '롬앤 쥬시 래스팅 틴트', price: 9900, category: 'makeup', tags: ['tint', 'lip'] },
+  { id: 'prod_105', name: '바닐라코 클린 잇 제로 클렌징 밤', price: 18000, category: 'cleansing', tags: ['cleanser', 'best-seller'] },
+  { id: 'prod_106', name: '이니스프리 그린티 씨드 세럼', price: 27000, category: 'skincare', tags: ['serum', 'moisture'] },
+  { id: 'prod_107', name: '에뛰드 순정 약산성 5.5 진정 토너', price: 15000, category: 'skincare', tags: ['toner', 'soothing'] },
+  { id: 'prod_108', name: '페리페라 잉크 더 에어리 벨벳', price: 9000, category: 'makeup', tags: ['tint', 'lip', 'velvet'] },
+  { id: 'prod_109', name: '아비브 어성초 스팟 패드 카밍터치', price: 24000, category: 'skincare', tags: ['toner-pad', 'soothing'] },
+  { id: 'prod_110', name: '닥터자르트 시카페어 크림', price: 48000, category: 'skincare', tags: ['cream', 'cicapair'] },
+];
+
+const mockUser = {
+  id: 'user_123',
+  name: '김혜인',
+  membershipTier: 'gold',
+  isNewUser: false,
+};
+
+// PROMOTION ENGINE LOGIC
+function checkCondition(condition, cart, user) {
+    const { target, attribute, operator, value } = condition;
+    switch (target) {
+        case 'cart':
+            if (attribute === 'subtotal') {
+                if (operator === 'GTE') return cart.subtotal >= parseFloat(value);
+                if (operator === 'LTE') return cart.subtotal <= parseFloat(value);
+            }
+            if (attribute === 'item_count') {
+                const totalCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+                if (operator === 'GTE') return totalCount >= parseInt(value, 10);
+            }
+            if (attribute === 'product_quantity') {
+                const item = cart.items.find(i => i.product.id === condition.productId);
+                if (!item) return false;
+                if (operator === 'GTE') return item.quantity >= parseInt(value, 10);
+            }
+            break;
+        case 'user':
+            if (attribute === 'membershipTier') {
+                if (operator === 'EQ') return user.membershipTier === value;
+            }
+            if (attribute === 'isNewUser') {
+                if (operator === 'EQ') return user.isNewUser === (value === 'true');
+            }
+            break;
+        case 'product':
+            if (attribute === 'category') {
+                if (operator === 'IN_CATEGORY') {
+                    return cart.items.some(item => item.product.category === value);
+                }
+            }
+            break;
+        default: return false;
+    }
+    return false;
+}
+
+function applyPromotions(cartItems, user, promotions) {
+    const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+    let finalTotal = subtotal;
+    const appliedPromotions = [];
+
+    const initialCartState = { items: cartItems, subtotal, finalTotal, appliedPromotions: [] };
+
+    const applicablePromotions = promotions
+        .filter(promo => {
+            const { conditionGroups = [], groupOperator = 'AND' } = promo;
+            if (!conditionGroups || conditionGroups.length === 0) return true;
+            const groupResults = conditionGroups.map(group => group.conditions.every(cond => checkCondition(cond, initialCartState, user)));
+            if (groupOperator === 'AND') return groupResults.every(res => res === true);
+            else return groupResults.some(res => res === true);
+        })
+        .sort((a, b) => a.priority - b.priority);
+
+    let isNonStackableApplied = false;
+
+    for (const promo of applicablePromotions) {
+        if (isNonStackableApplied && !promo.stackable) continue;
+        
+        let discountAmountThisPromo = 0;
+        let promoApplied = false;
+        let promoMetadata = {};
+
+        for (const action of promo.actions) {
+            switch (action.type) {
+                case 'CART_PERCENT_DISCOUNT': {
+                    const discount = finalTotal * (parseFloat(action.value) / 100);
+                    discountAmountThisPromo += discount;
+                    finalTotal -= discount;
+                    promoApplied = true;
+                    break;
+                }
+                case 'CART_FIXED_DISCOUNT': {
+                    const discount = parseFloat(action.value);
+                    discountAmountThisPromo += discount;
+                    finalTotal -= discount;
+                    promoApplied = true;
+                    break;
+                }
+                case 'PRODUCT_FIXED_DISCOUNT': { // BOGO
+                    const discount = parseFloat(action.value);
+                    discountAmountThisPromo += discount;
+                    finalTotal -= discount;
+                    promoApplied = true;
+                    break;
+                }
+                case 'TIERED_DISCOUNT': {
+                    const item = cartItems.find(i => i.product.id === action.targetProductId);
+                    if (item) {
+                        const sortedTiers = action.tiers.sort((a, b) => b.quantity - a.quantity);
+                        const applicableTier = sortedTiers.find(tier => item.quantity >= tier.quantity);
+                        if (applicableTier) {
+                            let discount = 0;
+                            if(applicableTier.type === 'PERCENT') {
+                                discount = (item.product.price * item.quantity) * (parseFloat(applicableTier.value) / 100);
+                            } else { // FIXED
+                                discount = parseFloat(applicableTier.value);
+                            }
+                            discountAmountThisPromo += discount;
+                            finalTotal -= discount;
+                            promoApplied = true;
+                            promoMetadata.description = `${item.name} ${applicableTier.quantity}개 이상, ${applicableTier.value}${applicableTier.type === 'PERCENT' ? '%' : '원'} 할인`;
+                        }
+                    }
+                    break;
+                }
+                 case 'ADD_FREE_PRODUCT': {
+                    const giftProduct = mockProducts.find(p => p.id === action.productId);
+                    if (giftProduct) {
+                        promoApplied = true;
+                        promoMetadata.description = `사은품: ${giftProduct.name}`;
+                    }
+                    break;
+                }
+                case 'FREE_SHIPPING': {
+                    promoApplied = true;
+                    promoMetadata.description = '배송비 무료';
+                    break;
+                }
+            }
+        }
+        if (promoApplied) {
+            appliedPromotions.push({
+                promotionId: promo.id,
+                promotionName: promo.name,
+                discountAmount: discountAmountThisPromo,
+                metadata: promoMetadata
+            });
+        }
+        if (!promo.stackable) isNonStackableApplied = true;
+    }
+
+    return {
+        items: cartItems,
+        subtotal,
+        appliedPromotions,
+        finalTotal: Math.max(0, finalTotal),
+    };
+}
+
+
+// UI COMPONENTS
+function UserProfile({ user, setUser }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>회원 정보 시뮬레이션</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="membership">회원 등급</Label>
+          <CustomSelect id="membership" value={user.membershipTier} onValueChange={value => setUser({ ...user, membershipTier: value })}>
+            <CustomSelectItem value="bronze">브론즈</CustomSelectItem>
+            <CustomSelectItem value="silver">실버</CustomSelectItem>
+            <CustomSelectItem value="gold">골드</CustomSelectItem>
+            <CustomSelectItem value="vip">VIP</CustomSelectItem>
+          </CustomSelect>
+        </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="new-user">신규 회원 여부</Label>
+          <Switch id="new-user" checked={user.isNewUser} onChange={checked => setUser({ ...user, isNewUser: checked })} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ProductList({ products, onAddToCart }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>상품 목록</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
+          {products.map(product => (
+            <div key={product.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+              <div>
+                <p className="font-medium">{product.name}</p>
+                <p className="text-sm text-zinc-500">{product.price.toLocaleString()}원</p>
+              </div>
+              <Button size="sm" onClick={() => onAddToCart(product)}>담기</Button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CartDisplay({ cart }) {
+    const { items, subtotal, appliedPromotions, finalTotal } = cart;
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center"><ShoppingCart className="mr-2 h-5 w-5" /> 장바구니</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {items.length === 0 ? ( <p className="text-center text-zinc-500 py-8">장바구니가 비어있습니다.</p> ) : (
+                    <div className="space-y-4">{items.map(item => ( <div key={item.product.id} className="flex justify-between items-start"> <div><p className="font-medium">{item.product.name}</p><p className="text-sm text-zinc-500">{item.quantity}개 x {item.product.price.toLocaleString()}원</p></div><p className="font-semibold">{(item.product.price * item.quantity).toLocaleString()}원</p></div> ))}</div>
+                )}
+            </CardContent>
+            {items.length > 0 && (
+                <CardFooter className="flex-col items-stretch space-y-4 bg-zinc-50 dark:bg-zinc-950/50 rounded-b-xl">
+                    <div className="flex justify-between text-md"><span>주문 금액</span><span>{subtotal.toLocaleString()}원</span></div>
+                    {appliedPromotions.map(promo => (
+                        <div key={promo.promotionId} className="flex justify-between text-md items-start">
+                            <div className="flex flex-col">
+                                <span className={promo.discountAmount > 0 ? "text-red-600 dark:text-red-500" : "text-zinc-700 dark:text-zinc-300"}>
+                                    {promo.promotionName}
+                                </span>
+                                {promo.metadata?.description && <span className="text-xs text-zinc-500">{promo.metadata.description}</span>}
+                            </div>
+                            {promo.discountAmount > 0 ? (
+                                 <span className="text-red-600 dark:text-red-500">- {promo.discountAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}원</span>
+                            ) : (promo.metadata?.description && promo.metadata.description.includes('배송')) ? (
+                                <span className="text-blue-600 dark:text-blue-500">무료</span>
+                            ) : (
+                                <span className="text-green-600 dark:text-green-500">적용</span>
+                            )}
+                        </div>
+                    ))}
+                    <Separator />
+                    <div className="flex justify-between text-xl font-bold"><span>최종 결제 금액</span><span>{finalTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}원</span></div>
+                </CardFooter>
+            )}
+        </Card>
+    );
+}
+
+function PromotionDrawer({ isOpen, onClose, onAddPromotion }) {
+    const [step, setStep] = useState('select_type');
+    const [selectedType, setSelectedType] = useState(null);
+    const initialPromoState = { name: '', groupOperator: 'AND', conditionGroups: [], actions: [], stackable: true, priority: 100 };
+    const [newPromo, setNewPromo] = useState(initialPromoState);
+
+    useEffect(() => {
+        if (isOpen) { document.body.style.overflow = 'hidden'; } 
+        else { document.body.style.overflow = 'auto'; }
+        return () => { document.body.style.overflow = 'auto'; };
+    }, [isOpen]);
+
+    const resetAndClose = () => {
+        onClose();
+        setTimeout(() => {
+            setStep('select_type');
+            setSelectedType(null);
+            setNewPromo(initialPromoState);
+        }, 300);
+    };
+
+    const handleTypeSelect = (type) => {
+        setSelectedType(type);
+        let basePromo = { ...initialPromoState };
+        const defaultProduct = mockProducts[0];
+        switch(type) {
+            case 'discount':
+                basePromo = { ...basePromo, name: '금액/비율 할인', actions: [{ type: 'CART_FIXED_DISCOUNT', value: '' }], conditionGroups: [{ id: Date.now(), conditions: [{ target: 'cart', attribute: 'subtotal', operator: 'GTE', value: '' }] }] }; break;
+            case 'bogo':
+                basePromo = { ...basePromo, name: 'BOGO 프로모션', actions: [{ type: 'PRODUCT_FIXED_DISCOUNT', value: defaultProduct.price }], conditionGroups: [{ id: Date.now(), conditions: [{ target: 'cart', attribute: 'product_quantity', operator: 'GTE', value: '2', productId: defaultProduct.id }] }] }; break;
+            case 'free_shipping':
+                basePromo = { ...basePromo, name: '무료 배송', actions: [{ type: 'FREE_SHIPPING' }], conditionGroups: [{ id: Date.now(), conditions: [{ target: 'cart', attribute: 'subtotal', operator: 'GTE', value: '' }] }] }; break;
+            case 'gwp':
+                basePromo = { ...basePromo, name: '사은품 증정', actions: [{ type: 'ADD_FREE_PRODUCT', productId: mockProducts[1].id }], conditionGroups: [{ id: Date.now(), conditions: [{ target: 'cart', attribute: 'subtotal', operator: 'GTE', value: '' }] }] }; break;
+            case 'tiered':
+                basePromo = { ...basePromo, name: '다다익선 할인', actions: [{ type: 'TIERED_DISCOUNT', targetProductId: defaultProduct.id, tiers: [{quantity: 2, type: 'PERCENT', value: 10}] }], conditionGroups: [] }; break;
+        }
+        setNewPromo(basePromo);
+        setStep('configure');
+    };
+
+    const handleSubmit = (e) => { e.preventDefault(); onAddPromotion({ ...newPromo, id: `promo_${Date.now()}` }); resetAndClose(); };
+    const handleBack = () => { setStep('select_type'); setNewPromo(initialPromoState); };
+    const handleConditionChange = (groupIndex, condIndex, field, value) => { const updatedGroups = [...newPromo.conditionGroups]; updatedGroups[groupIndex].conditions[condIndex][field] = value; setNewPromo(p => ({...p, conditionGroups: updatedGroups})); };
+    const handleActionChange = (actIndex, field, value) => { const updatedActions = [...newPromo.actions]; updatedActions[actIndex][field] = value; setNewPromo(p => ({...p, actions: updatedActions})); };
+    const handleTierChange = (tierIndex, field, value) => { const updatedActions = [...newPromo.actions]; updatedActions[0].tiers[tierIndex][field] = value; setNewPromo(p => ({...p, actions: updatedActions})); };
+    const addTier = () => { const updatedActions = [...newPromo.actions]; updatedActions[0].tiers.push({quantity: 3, type: 'PERCENT', value: 15}); setNewPromo(p => ({...p, actions: updatedActions})); };
+    const removeTier = (tierIndex) => { const updatedActions = [...newPromo.actions]; updatedActions[0].tiers.splice(tierIndex, 1); setNewPromo(p => ({...p, actions: updatedActions})); };
+
+    const renderConfigureStep = () => {
+        return (
+            <div className="space-y-6">
+                <div className="space-y-2"><Label htmlFor="promo-name">프로모션 이름</Label><Input id="promo-name" placeholder="예: 여름맞이 특별 할인" value={newPromo.name} onChange={e => setNewPromo(p => ({ ...p, name: e.target.value }))} required /></div>
+                {selectedType === 'discount' && (<div className="p-4 border rounded-lg space-y-4"><Label>할인 조건</Label><div className="grid grid-cols-3 gap-2"><CustomSelect value={newPromo.conditionGroups[0]?.conditions[0]?.target || 'cart'} onValueChange={value => handleConditionChange(0, 0, 'target', value)}><CustomSelectItem value="cart">장바구니</CustomSelectItem><CustomSelectItem value="user">사용자</CustomSelectItem></CustomSelect><CustomSelect value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'} onValueChange={value => handleConditionChange(0, 0, 'attribute', value)}><CustomSelectItem value="subtotal">총액</CustomSelectItem></CustomSelect><CustomSelect value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'} onValueChange={value => handleConditionChange(0, 0, 'operator', value)}><CustomSelectItem value="GTE">&gt;= (이상)</CustomSelectItem></CustomSelect></div><Input type="number" placeholder="조건값 (예: 50000)" value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''} onChange={e => handleConditionChange(0, 0, 'value', e.target.value)} required /><Separator/><div className="pt-4 space-y-2"><Label>할인 내용</Label><div className="grid grid-cols-2 gap-2"><CustomSelect value={newPromo.actions[0]?.type || 'CART_FIXED_DISCOUNT'} onValueChange={value => handleActionChange(0, 'type', value)}><CustomSelectItem value="CART_FIXED_DISCOUNT">금액 할인(원)</CustomSelectItem><CustomSelectItem value="CART_PERCENT_DISCOUNT">비율 할인(%)</CustomSelectItem></CustomSelect><Input type="number" placeholder="할인 값 (예: 5000, 10)" value={newPromo.actions[0]?.value || ''} onChange={e => handleActionChange(0, 'value', e.target.value)} required /></div></div></div>)}
+                {selectedType === 'bogo' && (<div className="p-4 border rounded-lg space-y-4"><Label>BOGO 조건 (Buy)</Label><CustomSelect value={newPromo.conditionGroups[0]?.conditions[0]?.productId || ''} onValueChange={value => { const selectedProduct = mockProducts.find(p => p.id === value); handleConditionChange(0, 0, 'productId', value); handleActionChange(0, 'value', selectedProduct ? selectedProduct.price : 0); }}>{mockProducts.map(p => <CustomSelectItem key={p.id} value={p.id}>{p.name}</CustomSelectItem>)}</CustomSelect><Input type="number" placeholder="구매 수량 (예: 2)" value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''} onChange={e => handleConditionChange(0, 0, 'value', e.target.value)} required /><Separator/><div className="pt-4 space-y-2"><Label>BOGO 혜택 (Get)</Label><p className="text-sm">1개 상품 금액({(newPromo.actions[0]?.value || 0).toLocaleString()}원)이 할인됩니다.</p></div></div>)}
+                {selectedType === 'free_shipping' && (<div className="p-4 border rounded-lg space-y-4"><Label>무료 배송 조건</Label><div className="grid grid-cols-2 gap-2"><CustomSelect value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'} onValueChange={value => handleConditionChange(0, 0, 'attribute', value)}><CustomSelectItem value="subtotal">장바구니 총액</CustomSelectItem><CustomSelectItem value="item_count">상품 수량</CustomSelectItem></CustomSelect><CustomSelect value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'} onValueChange={v => handleConditionChange(0,0,'operator',v)}><CustomSelectItem value="GTE">&gt;= (이상)</CustomSelectItem></CustomSelect></div><Input type="number" placeholder="금액 또는 수량 (예: 30000, 3)" value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''} onChange={e => handleConditionChange(0, 0, 'value', e.target.value)} required /></div>)}
+                {selectedType === 'gwp' && (<div className="p-4 border rounded-lg space-y-4"><Label>사은품 증정 조건</Label><div className="grid grid-cols-2 gap-2"><CustomSelect value={newPromo.conditionGroups[0]?.conditions[0]?.attribute || 'subtotal'} onValueChange={v=>handleConditionChange(0,0,'attribute',v)}><CustomSelectItem value="subtotal">장바구니 총액</CustomSelectItem></CustomSelect><CustomSelect value={newPromo.conditionGroups[0]?.conditions[0]?.operator || 'GTE'} onValueChange={v=>handleConditionChange(0,0,'operator',v)}><CustomSelectItem value="GTE">&gt;= (이상)</CustomSelectItem></CustomSelect></div><Input type="number" placeholder="금액 (예: 50000)" value={newPromo.conditionGroups[0]?.conditions[0]?.value || ''} onChange={e => handleConditionChange(0, 0, 'value', e.target.value)} required /><Separator/><div className="pt-4 space-y-2"><Label>증정 사은품</Label><CustomSelect value={newPromo.actions[0]?.productId || ''} onValueChange={value => handleActionChange(0, 'productId', value)}>{mockProducts.map(p => <CustomSelectItem key={p.id} value={p.id}>{p.name}</CustomSelectItem>)}</CustomSelect></div></div>)}
+                {selectedType === 'tiered' && (<div className="p-4 border rounded-lg space-y-4"><Label>할인 대상 상품</Label><CustomSelect value={newPromo.actions[0]?.targetProductId || ''} onValueChange={value => handleActionChange(0, 'targetProductId', value)}>{mockProducts.map(p => <CustomSelectItem key={p.id} value={p.id}>{p.name}</CustomSelectItem>)}</CustomSelect><Separator/><div className="pt-4 space-y-2"><Label>계층별 할인 설정</Label><div className="space-y-2">{newPromo.actions[0]?.tiers.map((tier, index) => (<div key={index} className="flex items-center gap-2 relative"><Input type="number" placeholder="수량" value={tier.quantity} onChange={e => handleTierChange(index, 'quantity', e.target.value)} /><span>개 이상</span><CustomSelect value={tier.type} onValueChange={value => handleTierChange(index, 'type', value)}><CustomSelectItem value="PERCENT">%</CustomSelectItem><CustomSelectItem value="FIXED">원</CustomSelectItem></CustomSelect><Input type="number" placeholder="할인 값" value={tier.value} onChange={e => handleTierChange(index, 'value', e.target.value)} /><Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeTier(index)}><X className="h-4 w-4"/></Button></div>))}</div><Button type="button" variant="outline" size="sm" onClick={addTier}>계층 추가</Button></div></div>)}
+            </div>
+        )
+    }
+
+    return (
+        <><div className={`fixed inset-0 bg-black/60 z-40 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={resetAndClose}></div><div className={`fixed bottom-0 left-0 right-0 z-50 transition-transform transform ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}><Card className="rounded-b-none rounded-t-xl max-h-[90vh] flex flex-col"><form onSubmit={handleSubmit}><CardHeader className="flex flex-row items-center justify-between"><div className="flex items-center">{step === 'configure' && <Button type="button" variant="ghost" size="icon" onClick={handleBack} className="mr-2 h-8 w-8"><ArrowLeft className="h-4 w-4"/></Button>}<div><CardTitle>{step === 'select_type' ? '프로모션 유형 선택' : '프로모션 세부 설정'}</CardTitle><CardDescription>{step === 'select_type' ? '적용할 프로모션의 기본 유형을 선택하세요.' : '규칙을 설정하여 프로모션을 완성하세요.'}</CardDescription></div></div><Button type="button" variant="ghost" size="icon" onClick={resetAndClose} className="h-8 w-8 rounded-full"><X className="h-4 w-4" /></Button></CardHeader><CardContent className="space-y-6 overflow-y-auto">{step === 'select_type' && (<div className="grid grid-cols-2 md:grid-cols-3 gap-4"><button type="button" onClick={() => handleTypeSelect('discount')} className="p-4 border rounded-lg flex flex-col items-center justify-center text-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"><Percent className="h-8 w-8 mb-2" /><span className="font-semibold">금액/비율 할인</span></button><button type="button" onClick={() => handleTypeSelect('bogo')} className="p-4 border rounded-lg flex flex-col items-center justify-center text-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"><Gift className="h-8 w-8 mb-2" /><span className="font-semibold">BOGO (1+1 등)</span></button><button type="button" onClick={() => handleTypeSelect('free_shipping')} className="p-4 border rounded-lg flex flex-col items-center justify-center text-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"><Truck className="h-8 w-8 mb-2" /><span className="font-semibold">무료 배송</span></button><button type="button" onClick={() => handleTypeSelect('gwp')} className="p-4 border rounded-lg flex flex-col items-center justify-center text-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"><Package className="h-8 w-8 mb-2" /><span className="font-semibold">사은품 증정</span></button><button type="button" onClick={() => handleTypeSelect('tiered')} className="p-4 border rounded-lg flex flex-col items-center justify-center text-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"><TrendingUp className="h-8 w-8 mb-2" /><span className="font-semibold">다다익선 할인</span></button></div>)}{step === 'configure' && renderConfigureStep()}</CardContent>{step === 'configure' && (<CardFooter className="bg-zinc-50 dark:bg-zinc-950/50"><Button type="submit" className="w-full">프로모션 저장</Button></CardFooter>)}</form></Card></div></>
+    );
+}
+
+function PromotionBuilder({ promotions, onAddPromotion, onRemovePromotion }) {
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    return (
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div><CardTitle>프로모션 규칙</CardTitle><CardDescription>생성된 프로모션 목록입니다.</CardDescription></div>
+                <Button onClick={() => setIsDrawerOpen(true)}><PlusCircle className="mr-2 h-4 w-4" /> 프로모션 추가</Button>
+            </CardHeader>
+            <CardContent>
+                 <div className="space-y-2">
+                     {promotions.length === 0 ? (<p className="text-sm text-center text-zinc-500 py-4">생성된 프로모션이 없습니다.</p>) : ( promotions.map(p => (<div key={p.id} className="flex justify-between items-center p-2 border rounded-md hover:bg-zinc-50 dark:hover:bg-zinc-800/50"><span>{p.name}</span><Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onRemovePromotion(p.id)}><Trash2 className="h-4 w-4"/></Button></div>)))}
+                </div>
+            </CardContent>
+            <PromotionDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} onAddPromotion={onAddPromotion} />
+        </Card>
+    );
+}
+
+// MAIN APP COMPONENT
+export default function App() {
+  const [products] = useState(mockProducts);
+  const [user, setUser] = useState(mockUser);
+  const [cartItems, setCartItems] = useState([]);
+  const [promotions, setPromotions] = useState([]);
+  
+  const calculatedCart = useMemo(() => {
+    return applyPromotions(cartItems, user, promotions);
+  }, [cartItems, user, promotions]);
+
+  const handleAddToCart = (productToAdd) => {
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(item => item.product.id === productToAdd.id);
+      if (existingItem) {
+        return prevItems.map(item =>
+          item.product.id === productToAdd.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prevItems, { product: productToAdd, quantity: 1 }];
+    });
+  };
+  
+  const handleAddPromotion = (newPromotion) => { setPromotions(prev => [...prev, newPromotion]); };
+  const handleRemovePromotion = (promoId) => { setPromotions(prev => prev.filter(p => p.id !== promoId)); };
+
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 font-sans">
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header className="mb-8"><h1 className="text-3xl font-bold tracking-tight">프로모션 엔진 시뮬레이터</h1><p className="text-zinc-600 dark:text-zinc-400">실시간으로 프로모션 규칙을 만들고 결과를 확인하세요.</p></header>
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <UserProfile user={user} setUser={setUser} />
+            <ProductList products={products} onAddToCart={handleAddToCart} />
+          </div>
+          <div>
+             <CartDisplay cart={calculatedCart} />
+          </div>
+          <div>
+             <PromotionBuilder promotions={promotions} onAddPromotion={handleAddPromotion} onRemovePromotion={handleRemovePromotion} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
