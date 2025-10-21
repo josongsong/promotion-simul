@@ -1198,11 +1198,11 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
         onClick={resetAndClose}
       />
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 transition-transform transform ${
+        className={`fixed inset-0 z-50 transition-transform transform ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
-        <Card className="rounded-b-none rounded-t-xl max-h-[90vh] flex flex-col">
+        <Card className="h-full flex flex-col rounded-none">
           <form onSubmit={handleSubmit}>
             <CardHeader className="flex flex-row items-center justify-between">
               <div className="flex items-center">
@@ -1238,7 +1238,8 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
                 <X className="h-4 w-4" />
               </Button>
             </CardHeader>
-            <CardContent className="space-y-6 overflow-y-auto">
+            <CardContent className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-6">
               {step === 'select_type' && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <button
@@ -1284,9 +1285,10 @@ export function PromotionDrawer({ isOpen, onClose, onAddPromotion }: PromotionDr
                 </div>
               )}
               {step === 'configure' && renderConfigureStep()}
+              </div>
             </CardContent>
             {step === 'configure' && (
-              <CardFooter className="bg-muted/50">
+              <CardFooter className="bg-muted/50 border-t">
                 <Button type="submit" className="w-full">
                   프로모션 저장
                 </Button>
