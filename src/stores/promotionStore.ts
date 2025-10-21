@@ -103,7 +103,7 @@ const mockProducts: Product[] = [
     price: 25000, 
     category: 'skincare', 
     tags: ['sunscreen', 'moisture'],
-    image: 'https://picsum.photos/300/300?random=1'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_102', 
@@ -111,7 +111,7 @@ const mockProducts: Product[] = [
     price: 2000, 
     category: 'skincare', 
     tags: ['mask', 'soothing'],
-    image: 'https://picsum.photos/300/300?random=2'
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_106', 
@@ -119,7 +119,7 @@ const mockProducts: Product[] = [
     price: 27000, 
     category: 'skincare', 
     tags: ['serum', 'moisture'],
-    image: 'https://picsum.photos/300/300?random=3'
+    image: 'https://images.unsplash.com/photo-1599305090596-0b0a0b0b0b0b?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_107', 
@@ -127,7 +127,7 @@ const mockProducts: Product[] = [
     price: 15000, 
     category: 'skincare', 
     tags: ['toner', 'soothing'],
-    image: 'https://picsum.photos/300/300?random=4'
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_109', 
@@ -135,7 +135,7 @@ const mockProducts: Product[] = [
     price: 24000, 
     category: 'skincare', 
     tags: ['toner-pad', 'soothing'],
-    image: 'https://picsum.photos/300/300?random=5'
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_110', 
@@ -143,7 +143,7 @@ const mockProducts: Product[] = [
     price: 48000, 
     category: 'skincare', 
     tags: ['cream', 'cicapair'],
-    image: 'https://picsum.photos/300/300?random=6'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_111', 
@@ -151,7 +151,7 @@ const mockProducts: Product[] = [
     price: 22000, 
     category: 'skincare', 
     tags: ['sunscreen', 'men'],
-    image: 'https://picsum.photos/300/300?random=7'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_113', 
@@ -159,7 +159,7 @@ const mockProducts: Product[] = [
     price: 120000, 
     category: 'skincare', 
     tags: ['cream', 'luxury'],
-    image: 'https://picsum.photos/300/300?random=8'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_115', 
@@ -167,7 +167,7 @@ const mockProducts: Product[] = [
     price: 28000, 
     category: 'skincare', 
     tags: ['cream', 'hydration'],
-    image: 'https://picsum.photos/300/300?random=9'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_116', 
@@ -175,7 +175,7 @@ const mockProducts: Product[] = [
     price: 35000, 
     category: 'skincare', 
     tags: ['cream', 'moisture'],
-    image: 'https://picsum.photos/300/300?random=10'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_117', 
@@ -183,7 +183,7 @@ const mockProducts: Product[] = [
     price: 45000, 
     category: 'skincare', 
     tags: ['essence', 'anti-aging'],
-    image: 'https://picsum.photos/300/300?random=11'
+    image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_118', 
@@ -191,7 +191,7 @@ const mockProducts: Product[] = [
     price: 85000, 
     category: 'skincare', 
     tags: ['essence', 'luxury'],
-    image: 'https://picsum.photos/300/300?random=12'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center12'
   },
   { 
     id: 'prod_119', 
@@ -199,7 +199,7 @@ const mockProducts: Product[] = [
     price: 18000, 
     category: 'skincare', 
     tags: ['lotion', 'baby'],
-    image: 'https://picsum.photos/300/300?random=13'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center13'
   },
   { 
     id: 'prod_120', 
@@ -207,7 +207,7 @@ const mockProducts: Product[] = [
     price: 19000, 
     category: 'skincare', 
     tags: ['gel', 'acne'],
-    image: 'https://picsum.photos/300/300?random=14'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center14'
   },
   { 
     id: 'prod_121', 
@@ -215,7 +215,7 @@ const mockProducts: Product[] = [
     price: 22000, 
     category: 'skincare', 
     tags: ['eye-cream', 'moisture'],
-    image: 'https://picsum.photos/300/300?random=15'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center15'
   },
   { 
     id: 'prod_122', 
@@ -223,7 +223,7 @@ const mockProducts: Product[] = [
     price: 18000, 
     category: 'skincare', 
     tags: ['toner', 'moisture'],
-    image: 'https://picsum.photos/300/300?random=16'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center16'
   },
   { 
     id: 'prod_123', 
@@ -231,7 +231,7 @@ const mockProducts: Product[] = [
     price: 20000, 
     category: 'skincare', 
     tags: ['cream', 'baby'],
-    image: 'https://picsum.photos/300/300?random=17'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center17'
   },
   { 
     id: 'prod_124', 
@@ -239,7 +239,7 @@ const mockProducts: Product[] = [
     price: 21000, 
     category: 'skincare', 
     tags: ['cream', 'acne'],
-    image: 'https://picsum.photos/300/300?random=18'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center18'
   },
   { 
     id: 'prod_125', 
@@ -247,7 +247,7 @@ const mockProducts: Product[] = [
     price: 32000, 
     category: 'skincare', 
     tags: ['essence', 'hydration'],
-    image: 'https://picsum.photos/300/300?random=19'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center19'
   },
   { 
     id: 'prod_126', 
@@ -255,7 +255,7 @@ const mockProducts: Product[] = [
     price: 15000, 
     category: 'skincare', 
     tags: ['toner', 'soothing'],
-    image: 'https://picsum.photos/300/300?random=20'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center20'
   },
 
   // 메이크업 (15개)
@@ -265,7 +265,7 @@ const mockProducts: Product[] = [
     price: 32000, 
     category: 'makeup', 
     tags: ['cushion', 'best-seller'],
-    image: 'https://picsum.photos/300/300?random=21'
+    image: 'https://images.unsplash.com/photo-1599305090596-0b0a0b0b0b0b?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_104', 
@@ -273,7 +273,7 @@ const mockProducts: Product[] = [
     price: 9900, 
     category: 'makeup', 
     tags: ['tint', 'lip'],
-    image: 'https://picsum.photos/300/300?random=22'
+    image: 'https://images.unsplash.com/photo-1599305090596-0b0a0b0b0b0b?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_108', 
@@ -281,7 +281,7 @@ const mockProducts: Product[] = [
     price: 9000, 
     category: 'makeup', 
     tags: ['tint', 'lip', 'velvet'],
-    image: 'https://picsum.photos/300/300?random=23'
+    image: 'https://images.unsplash.com/photo-1599305090596-0b0a0b0b0b0b?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_112', 
@@ -289,7 +289,7 @@ const mockProducts: Product[] = [
     price: 35000, 
     category: 'makeup', 
     tags: ['powder', 'matte'],
-    image: 'https://picsum.photos/300/300?random=24'
+    image: 'https://images.unsplash.com/photo-1599305090596-0b0a0b0b0b0b?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_114', 
@@ -297,7 +297,7 @@ const mockProducts: Product[] = [
     price: 18000, 
     category: 'makeup', 
     tags: ['cushion', 'blur'],
-    image: 'https://picsum.photos/300/300?random=25'
+    image: 'https://images.unsplash.com/photo-1599305090596-0b0a0b0b0b0b?w=300&h=300&fit=crop&crop=center'
   },
   { 
     id: 'prod_127', 
@@ -305,7 +305,7 @@ const mockProducts: Product[] = [
     price: 25000, 
     category: 'makeup', 
     tags: ['cushion', 'coverage'],
-    image: 'https://picsum.photos/300/300?random=26'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center26'
   },
   { 
     id: 'prod_128', 
@@ -313,7 +313,7 @@ const mockProducts: Product[] = [
     price: 45000, 
     category: 'makeup', 
     tags: ['cushion', 'luxury'],
-    image: 'https://picsum.photos/300/300?random=27'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center27'
   },
   { 
     id: 'prod_129', 
@@ -321,7 +321,7 @@ const mockProducts: Product[] = [
     price: 55000, 
     category: 'makeup', 
     tags: ['cushion', 'luxury'],
-    image: 'https://picsum.photos/300/300?random=28'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center28'
   },
   { 
     id: 'prod_130', 
@@ -329,7 +329,7 @@ const mockProducts: Product[] = [
     price: 28000, 
     category: 'makeup', 
     tags: ['foundation', 'coverage'],
-    image: 'https://picsum.photos/300/300?random=29'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center29'
   },
   { 
     id: 'prod_131', 
@@ -337,7 +337,7 @@ const mockProducts: Product[] = [
     price: 22000, 
     category: 'makeup', 
     tags: ['foundation', 'long-lasting'],
-    image: 'https://picsum.photos/300/300?random=30'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center30'
   },
   { 
     id: 'prod_132', 
@@ -345,7 +345,7 @@ const mockProducts: Product[] = [
     price: 12000, 
     category: 'makeup', 
     tags: ['blush', 'cheek'],
-    image: 'https://picsum.photos/300/300?random=31'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center31'
   },
   { 
     id: 'prod_133', 
@@ -353,7 +353,7 @@ const mockProducts: Product[] = [
     price: 15000, 
     category: 'makeup', 
     tags: ['eyeshadow', 'eye'],
-    image: 'https://picsum.photos/300/300?random=32'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center32'
   },
   { 
     id: 'prod_134', 
@@ -361,7 +361,7 @@ const mockProducts: Product[] = [
     price: 25000, 
     category: 'makeup', 
     tags: ['eyeshadow', 'luxury'],
-    image: 'https://picsum.photos/300/300?random=33'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center33'
   },
   { 
     id: 'prod_135', 
@@ -369,7 +369,7 @@ const mockProducts: Product[] = [
     price: 11000, 
     category: 'makeup', 
     tags: ['lipstick', 'velvet'],
-    image: 'https://picsum.photos/300/300?random=34'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center34'
   },
   { 
     id: 'prod_136', 
@@ -377,7 +377,7 @@ const mockProducts: Product[] = [
     price: 8000, 
     category: 'makeup', 
     tags: ['gloss', 'lip'],
-    image: 'https://picsum.photos/300/300?random=35'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center35'
   },
 
   // 클렌징 (10개)
@@ -387,7 +387,7 @@ const mockProducts: Product[] = [
     price: 18000, 
     category: 'cleansing', 
     tags: ['cleanser', 'best-seller'],
-    image: 'https://picsum.photos/300/300?random=36'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center36'
   },
   { 
     id: 'prod_137', 
@@ -395,7 +395,7 @@ const mockProducts: Product[] = [
     price: 15000, 
     category: 'cleansing', 
     tags: ['foam', 'cleanser'],
-    image: 'https://picsum.photos/300/300?random=37'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center37'
   },
   { 
     id: 'prod_138', 
@@ -403,7 +403,7 @@ const mockProducts: Product[] = [
     price: 16000, 
     category: 'cleansing', 
     tags: ['foam', 'acne'],
-    image: 'https://picsum.photos/300/300?random=38'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center38'
   },
   { 
     id: 'prod_139', 
@@ -411,7 +411,7 @@ const mockProducts: Product[] = [
     price: 12000, 
     category: 'cleansing', 
     tags: ['foam', 'baby'],
-    image: 'https://picsum.photos/300/300?random=39'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center39'
   },
   { 
     id: 'prod_140', 
@@ -419,7 +419,7 @@ const mockProducts: Product[] = [
     price: 13000, 
     category: 'cleansing', 
     tags: ['foam', 'natural'],
-    image: 'https://picsum.photos/300/300?random=40'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center40'
   },
   { 
     id: 'prod_141', 
@@ -427,7 +427,7 @@ const mockProducts: Product[] = [
     price: 25000, 
     category: 'cleansing', 
     tags: ['balm', 'luxury'],
-    image: 'https://picsum.photos/300/300?random=41'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center41'
   },
   { 
     id: 'prod_142', 
@@ -435,7 +435,7 @@ const mockProducts: Product[] = [
     price: 35000, 
     category: 'cleansing', 
     tags: ['foam', 'luxury'],
-    image: 'https://picsum.photos/300/300?random=42'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center42'
   },
   { 
     id: 'prod_143', 
@@ -443,7 +443,7 @@ const mockProducts: Product[] = [
     price: 18000, 
     category: 'cleansing', 
     tags: ['foam', 'hydration'],
-    image: 'https://picsum.photos/300/300?random=43'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center43'
   },
   { 
     id: 'prod_144', 
@@ -451,7 +451,7 @@ const mockProducts: Product[] = [
     price: 14000, 
     category: 'cleansing', 
     tags: ['foam', 'soothing'],
-    image: 'https://picsum.photos/300/300?random=44'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center44'
   },
   { 
     id: 'prod_145', 
@@ -459,7 +459,7 @@ const mockProducts: Product[] = [
     price: 11000, 
     category: 'cleansing', 
     tags: ['foam', 'gentle'],
-    image: 'https://picsum.photos/300/300?random=45'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center45'
   },
 
   // 바디케어 (5개)
@@ -469,7 +469,7 @@ const mockProducts: Product[] = [
     price: 25000, 
     category: 'bodycare', 
     tags: ['lotion', 'baby', 'large'],
-    image: 'https://picsum.photos/300/300?random=46'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center46'
   },
   { 
     id: 'prod_147', 
@@ -477,7 +477,7 @@ const mockProducts: Product[] = [
     price: 18000, 
     category: 'bodycare', 
     tags: ['lotion', 'hydration'],
-    image: 'https://picsum.photos/300/300?random=47'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center47'
   },
   { 
     id: 'prod_148', 
@@ -485,7 +485,7 @@ const mockProducts: Product[] = [
     price: 12000, 
     category: 'bodycare', 
     tags: ['bodywash', 'natural'],
-    image: 'https://picsum.photos/300/300?random=48'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center48'
   },
   { 
     id: 'prod_149', 
@@ -493,7 +493,7 @@ const mockProducts: Product[] = [
     price: 20000, 
     category: 'bodycare', 
     tags: ['lotion', 'acne'],
-    image: 'https://picsum.photos/300/300?random=49'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center49'
   },
   { 
     id: 'prod_150', 
@@ -501,7 +501,7 @@ const mockProducts: Product[] = [
     price: 30000, 
     category: 'bodycare', 
     tags: ['cream', 'luxury'],
-    image: 'https://picsum.photos/300/300?random=50'
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&h=300&fit=crop&crop=center50'
   }
 ]
 

@@ -2,11 +2,14 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, Trash2 } from "lucide-react"
-import { PromotionDrawer } from "./PromotionDrawer"
+import { PromotionTypeDrawer } from "./PromotionTypeDrawer"
+import { PromotionDetailDrawer } from "./PromotionDetailDrawer"
 import { usePromotionStore } from "@/stores/promotionStore"
 
 export function PromotionBuilder() {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isTypeDrawerOpen, setIsTypeDrawerOpen] = useState(false)
+  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false)
+  const [selectedType, setSelectedType] = useState<string | null>(null)
   const { promotions, addPromotion, removePromotion } = usePromotionStore()
 
   return (
@@ -16,7 +19,7 @@ export function PromotionBuilder() {
           <CardTitle>프로모션 규칙</CardTitle>
           <CardDescription>생성된 프로모션 목록입니다.</CardDescription>
         </div>
-        <Button onClick={() => setIsDrawerOpen(true)}>
+        <Button onClick={() => setIsTypeDrawerOpen(true)}>
           <PlusCircle className="mr-2 h-4 w-4" />
           프로모션 추가
         </Button>
@@ -44,10 +47,23 @@ export function PromotionBuilder() {
           )}
         </div>
       </CardContent>
-      <PromotionDrawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
+      <PromotionTypeDrawer
+        isOpen={isTypeDrawerOpen}
+        onClose={() => setIsTypeDrawerOpen(false)}
+        onTypeSelect={(type) => {
+          setSelectedType(type)
+          setIsTypeDrawerOpen(false)
+          setIsDetailDrawerOpen(true)
+        }}
+      />
+      <PromotionDetailDrawer
+        isOpen={isDetailDrawerOpen}
+        onClose={() => {
+          setIsDetailDrawerOpen(false)
+          setSelectedType(null)
+        }}
         onAddPromotion={addPromotion}
+        selectedType={selectedType || ''}
       />
     </Card>
   )

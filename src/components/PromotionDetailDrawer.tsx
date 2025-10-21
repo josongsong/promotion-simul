@@ -191,71 +191,34 @@ export function PromotionDetailDrawer({ isOpen, onClose, onAddPromotion, selecte
                 {/* 프로모션 타입별 조건 및 액션 설정 */}
                 {selectedType === 'discount' && (
                   <div className="space-y-6">
-                    {/* 조건 그룹 간 연산자 선택 */}
-                    <div className="p-4 border rounded-lg space-y-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
-                      <div className="flex items-center gap-2">
-                        <Label className="text-base font-semibold">조건 그룹 연산자</Label>
-                        <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                          <span className="text-xs font-medium text-blue-700 dark:text-blue-300">
-                            {newPromo.groupOperator === 'AND' ? '모든 그룹 만족' : '하나 이상 만족'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'AND' }))}
-                          className={`p-3 rounded-lg border-2 transition-all ${
-                            newPromo.groupOperator === 'AND'
-                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300'
-                              : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:bg-blue-50/50'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
-                              {newPromo.groupOperator === 'AND' && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
-                            </div>
-                            <div className="text-left">
-                              <div className="font-semibold text-sm">AND</div>
-                              <div className="text-xs text-gray-600 dark:text-gray-400">모든 조건 그룹이 만족</div>
-                            </div>
-                          </div>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setNewPromo(p => ({ ...p, groupOperator: 'OR' }))}
-                          className={`p-3 rounded-lg border-2 transition-all ${
-                            newPromo.groupOperator === 'OR'
-                              ? 'border-green-500 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300'
-                              : 'border-gray-200 dark:border-gray-700 hover:border-green-300 hover:bg-green-50/50'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
-                              {newPromo.groupOperator === 'OR' && <div className="w-2 h-2 bg-green-500 rounded-full" />}
-                            </div>
-                            <div className="text-left">
-                              <div className="font-semibold text-sm">OR</div>
-                              <div className="text-xs text-gray-600 dark:text-gray-400">하나 이상의 그룹이 만족</div>
-                            </div>
-                          </div>
-                        </button>
-                      </div>
-                    </div>
                     
                     <div className="p-4 border rounded-lg space-y-4">
                       <div className="flex items-center justify-between">
                         <Label>할인 조건</Label>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={addConditionGroup}
-                          className="flex items-center gap-2"
-                        >
-                          <span>+</span>
-                          조건 그룹 추가
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={newPromo.groupOperator}
+                            onValueChange={(value) => setNewPromo(p => ({ ...p, groupOperator: value as 'AND' | 'OR' }))}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="AND">AND</SelectItem>
+                              <SelectItem value="OR">OR</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addConditionGroup}
+                            className="flex items-center gap-2"
+                          >
+                            <span>+</span>
+                            조건 그룹 추가
+                          </Button>
+                        </div>
                       </div>
                       {/* 조건 그룹들 렌더링 */}
                       {newPromo.conditionGroups.map((group, groupIndex) => (
